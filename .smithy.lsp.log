@@ -1,0 +1,97 @@
+[15:56:25] Created a temporary folder for file contents /var/folders/02/2lh0wgsx1c91hq9m4pdj1bz80000gn/T/smithy-lsp13669878569304448657
+[15:56:25] Could not read Language Server version: java.lang.NullPointerException: inStream parameter is null
+[15:56:25] Recreating project from /Users/moritzlintterer/repos/my-app
+[15:56:25] Imports from config: [/Users/moritzlintterer/repos/my-app] will be resolved against root /Users/moritzlintterer/repos/my-app
+[15:56:25] Discovered smithy files: [/Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/build/smithyprojections/server-codegen/source/sources/apigateway.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/smithyprojections/string-wizard-model/source/sources/main.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/tmp/smithy-inf/META-INF/smithy/main.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/src/main/smithy/main.smithy]
+[15:56:25] Downloading external dependencies for SmithyBuildExtensions(repositories = [], artifacts = [], imports = [])
+[15:56:25] Downloaded external jars: []
+[15:56:25] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.auth#sigv4`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:15:1
+[15:56:25] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.protocols#restJson1`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:16:1
+[15:56:25] [ERROR] software.amazon.smithy.demo#Echo: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:3:12
+[15:56:25] [ERROR] software.amazon.smithy.demo#Length: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:9:14
+[15:56:25] Recreating project from /Users/moritzlintterer/repos/my-app
+[15:56:25] Imports from config: [/Users/moritzlintterer/repos/my-app] will be resolved against root /Users/moritzlintterer/repos/my-app
+[15:56:25] Discovered smithy files: [/Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/build/smithyprojections/server-codegen/source/sources/apigateway.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/smithyprojections/string-wizard-model/source/sources/main.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/tmp/smithy-inf/META-INF/smithy/main.smithy, /Users/moritzlintterer/repos/my-app/smithy-codegen/model/src/main/smithy/main.smithy]
+[15:56:25] Downloading external dependencies for SmithyBuildExtensions(repositories = [], artifacts = [], imports = [])
+[15:56:25] Downloaded external jars: []
+[15:56:25] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.auth#sigv4`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:15:1
+[15:56:25] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.protocols#restJson1`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:16:1
+[15:56:25] [ERROR] software.amazon.smithy.demo#Echo: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:3:12
+[15:56:25] [ERROR] software.amazon.smithy.demo#Length: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:9:14
+[15:56:25] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.auth#sigv4`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:15:1
+[15:56:25] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.protocols#restJson1`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:16:1
+[15:56:25] [ERROR] software.amazon.smithy.demo#Echo: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:3:12
+[15:56:25] [ERROR] software.amazon.smithy.demo#Length: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:9:14
+[15:56:25] Recompiling /Users/moritzlintterer/repos/my-app/smithy-codegen/model/src/main/smithy/main.smithy (with temporary content Optional.empty) raised 4  diagnostics
+[15:57:30] Trying to find a token in line '@sigv4(name: "execute-api")' at position Position [
+  line = 14
+  character = 22
+]
+[15:57:30] Trying to find a token in line '// Uncomment the line below to enable cross-origin resource sharing' at position Position [
+  line = 11
+  character = 18
+]
+[15:57:30] Trying to find a token in line '// Cors should be enabled for externally facing services and disabled for internally facing services.' at position Position [
+  line = 9
+  character = 17
+]
+[15:57:30] Trying to find a token in line '// Cross-origin resource sharing allows resources to be requested from external domains.' at position Position [
+  line = 8
+  character = 15
+]
+[15:57:30] Trying to find a token in line '@title("A magical string manipulation service")' at position Position [
+  line = 6
+  character = 13
+]
+[15:57:30] Trying to find a token in line 'use smithy.framework#ValidationException' at position Position [
+  line = 4
+  character = 11
+]
+[15:57:30] Trying to find a token in line 'use aws.protocols#restJson1' at position Position [
+  line = 3
+  character = 10
+]
+[15:57:30] Trying to find a token in line 'use aws.auth#sigv4' at position Position [
+  line = 2
+  character = 8
+]
+[15:57:44] Trying to find a token in line '// Enabling cors will modify the OpenAPI spec used to define your API Gateway endpoint.' at position Position [
+  line = 10
+  character = 26
+]
+[15:57:44] Trying to find a token in line '// Cross-origin resource sharing allows resources to be requested from external domains.' at position Position [
+  line = 8
+  character = 24
+]
+[15:57:44] Trying to find a token in line 'use smithy.framework#ValidationException' at position Position [
+  line = 4
+  character = 16
+]
+[15:57:44] Trying to find a token in line 'use aws.auth#sigv4' at position Position [
+  line = 2
+  character = 13
+]
+[15:57:44] Trying to find a token in line 'namespace software.amazon.smithy.demo' at position Position [
+  line = 0
+  character = 10
+]
+[15:57:44] Trying to find a token in line 'namespace software.amazon.smithy.demo' at position Position [
+  line = 0
+  character = 9
+]
+[16:16:06] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.auth#sigv4`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:15:1
+[16:16:06] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.protocols#restJson1`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:16:1
+[16:16:06] [ERROR] software.amazon.smithy.demo#Echo: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:3:12
+[16:16:06] [ERROR] software.amazon.smithy.demo#Length: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:9:14
+[16:16:06] Recompiling /Users/moritzlintterer/repos/my-app/smithy-codegen/model/src/main/smithy/main.smithy (with temporary content Optional.empty) raised 4  diagnostics
+[08:37:52] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.auth#sigv4`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:15:1
+[08:37:52] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.protocols#restJson1`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:16:1
+[08:37:52] [ERROR] software.amazon.smithy.demo#Echo: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:3:12
+[08:37:52] [ERROR] software.amazon.smithy.demo#Length: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:9:14
+[08:37:52] Recompiling /Users/moritzlintterer/repos/my-app/smithy-codegen/model/src/main/smithy/main.smithy (with temporary content Optional.empty) raised 4  diagnostics
+[09:50:37] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.auth#sigv4`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:15:1
+[09:50:37] [ERROR] software.amazon.smithy.demo#StringWizard: Unable to resolve trait `aws.protocols#restJson1`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/model/build/resources/main/META-INF/smithy/main.smithy:16:1
+[09:50:37] [ERROR] software.amazon.smithy.demo#Echo: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:3:12
+[09:50:37] [ERROR] software.amazon.smithy.demo#Length: Unable to resolve trait `aws.apigateway#integration`. If this is a custom trait, then it must be defined before it can be used in a model. | Model /Users/moritzlintterer/repos/my-app/smithy-codegen/server/codegen/model/apigateway.smithy:9:14
+[09:50:37] Recompiling /Users/moritzlintterer/repos/my-app/smithy-codegen/model/src/main/smithy/main.smithy (with temporary content Optional.empty) raised 4  diagnostics
+[13:27:12] Build files changed, rebuilding the project
