@@ -1,5 +1,5 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import * as API from "@smithy-demo/string-wizard-service-ssdk";
+import * as API from "smithy-api-typescript-gen";
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   const value: undefined | API.EchoServerInput = undefined;

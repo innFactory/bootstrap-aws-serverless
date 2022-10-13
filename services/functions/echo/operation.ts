@@ -1,16 +1,20 @@
 import { Operation } from "@aws-smithy/server-common";
+import {
+  EchoServerInput,
+  EchoServerOutput,
+  PalindromeException,
+} from "smithy-api-typescript-gen";
 import { HandlerContext } from "../../utils/apiGatewayHandler";
-import * as API from "../../codegen";
 
 export const EchoOperation: Operation<
-  API.EchoServerInput,
-  API.EchoServerOutput,
+  EchoServerInput,
+  EchoServerOutput,
   HandlerContext
 > = async (input, context) => {
   console.log(`Received Echo operation from: ${context.user}`);
 
   if (input.message != undefined && input.message === reverse(input.message)) {
-    throw new API.PalindromeException({
+    throw new PalindromeException({
       message: "Cannot handle palindrome",
     });
   }

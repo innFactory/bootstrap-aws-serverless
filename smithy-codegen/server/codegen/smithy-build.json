@@ -1,0 +1,32 @@
+{
+  "version" : "1.0",
+  "outputDirectory" : "build/output",
+  "maven": {
+    "dependencies": [
+      "software.amazon.smithy:smithy-cli:1.24.0",
+      "software.amazon.smithy:smithy-model:1.24.0",
+      "software.amazon.smithy:smithy-openapi:1.24.0",
+      "software.amazon.smithy:smithy-aws-traits:1.24.0",
+      "software.amazon.smithy:smithy-aws-apigateway:1.24.0",
+      "software.amazon.smithy:smithy-aws-auth:1.24.0"
+    ],
+    "repositories": [{ "url": "https://repo1.maven.org/maven2/" }]
+  },
+  "projections" : {
+    
+    "ts-server" : {
+      "imports" : ["model/"],
+      "plugins": {
+        "typescript-ssdk-codegen" : {
+          "package" : "smithy-api-typescript-gen",
+          "packageVersion": "0.0.1"
+        },
+        "openapi": {
+          "service": "de.innfactory.gen#StringWizard",
+          "protocol": "aws.protocols#restJson1",
+          "apiGatewayType" : "REST"
+        }
+      }
+    }
+  }
+}

@@ -6,6 +6,7 @@ export default function (app: App) {
     runtime: "nodejs16.x",
     srcPath: "services",
     bundle: {
+      nodeModules: ["re2-wasm"],
       format: "cjs",
     },
   });

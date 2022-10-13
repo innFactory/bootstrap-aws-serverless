@@ -1,8 +1,8 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import * as API from "../../codegen";
 import { LengthOperation } from "./operation";
 import { getApiGatewayHandler } from "utils/apiGatewayHandler";
+import { getLengthHandler } from "smithy-api-typescript-gen";
 
 export const lambdaHandler: APIGatewayProxyHandlerV2 = getApiGatewayHandler(
-  API.getLengthHandler(LengthOperation)
+  getLengthHandler(LengthOperation)
 );

@@ -1,0 +1,18 @@
+{
+  "name": "smithy-typescript-codegen",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "generate": "./gradlew clean build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run generate && npm run build:server"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.27",
+    "rimraf": "^3.0.0"
+  },
+  "workspaces": [
+    "server"
+  ]
+}

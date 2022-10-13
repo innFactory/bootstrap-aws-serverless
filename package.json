@@ -9,10 +9,15 @@
     "remove": "sst remove",
     "console": "sst console",
     "typecheck": "tsc --noEmit",
-    "test": "sst load-config -- vitest run"
+    "test": "sst load-config -- vitest run",
+    "copy:model" : "cpx \"smithy-definitions/model/*.smithy\" \"smithy-codegen/model/src/main/smithy\"",
+    "copy:apigateway" : "cpx \"smithy-definitions/apigateway/*.smithy\" \"smithy-codegen/server/codegen/model\"",
+    "codegen" : "npm run copy:model && npm run copy:apigateway && cd smithy-codegen && npm run build",
+    "codegen:first" : "npm run copy:model && npm run copy:apigateway && cd smithy-codegen && ./gradlew build && npm install && npm run build"
   },
   "devDependencies": {
     "aws-cdk-lib": "2.39.1",
+    "cpx": "1.5.0",
     "@serverless-stack/cli": "^1.15.8",
     "@serverless-stack/resources": "^1.15.8",
     "typescript": "^4.6.4",
@@ -22,8 +27,8 @@
 
   "dependencies": {
     "@aws-smithy/server-apigateway": "^1.0.0-alpha.6",
-    "@aws-smithy/server-common": "^1.0.0-alpha.6",
-    "re2-wasm": "^1.0.2"
+    "smithy-api-typescript-gen": "smithy-codegen/server/codegen/build/smithyprojections/server-codegen/ts-server/typescript-ssdk-codegen",
+    "@aws-smithy/server-common": "^1.0.0-alpha.6"
   },
   "workspaces": [
     "services"

@@ -1,16 +1,20 @@
 import { Operation } from "@aws-smithy/server-common";
-import * as API from "../../codegen";
+import {
+  LengthServerInput,
+  LengthServerOutput,
+  PalindromeException,
+} from "smithy-api-typescript-gen";
 import { HandlerContext } from "utils/apiGatewayHandler";
 
 export const LengthOperation: Operation<
-  API.LengthServerInput,
-  API.LengthServerOutput,
+  LengthServerInput,
+  LengthServerOutput,
   HandlerContext
 > = async (input, context) => {
   console.log(`Received Length operation from: ${context.user}`);
 
   if (input.message != undefined && input.message === reverse(input.message)) {
-    throw new API.PalindromeException({
+    throw new PalindromeException({
       message: "Cannot handle palindrome",
     });
   }
