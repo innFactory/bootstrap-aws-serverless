@@ -15,3 +15,10 @@ node_modules
 
 # Ignore Gradle build output directory
 build
+
+# Ignore log files
+*.log
+
+
+# Ignore javascript files
+*.js
