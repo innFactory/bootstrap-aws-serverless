@@ -18,7 +18,7 @@ build
 
 # Ignore log files
 *.log
-
+.smithy.lsp.log
 
 # Ignore javascript files
 *.js
