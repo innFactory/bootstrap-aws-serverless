@@ -1,13 +1,10 @@
 {
-    "version": "2.0",
-    "maven": {
-      "dependencies": [
-        "software.amazon.smithy:smithy-cli:1.24.0",
-        "software.amazon.smithy:smithy-model:1.24.0",
-        "software.amazon.smithy:smithy-openapi:1.24.0",
-        "software.amazon.smithy:smithy-aws-traits:1.24.0",
-        "software.amazon.smithy:smithy-aws-apigateway:1.24.0"
-      ],
-      "repositories": [{ "url": "https://repo1.maven.org/maven2/" }]
-    }
-  }
+  "version": "2.0",
+  "mavenDependencies": [
+    "software.amazon.smithy:smithy-aws-traits:1.26.0",
+    "software.amazon.smithy:smithy-model:1.26.0",
+    "software.amazon.smithy:smithy-aws-apigateway-traits:1.26.0",
+    "software.amazon.smithy:smithy-codegen-core:1.26.0",
+    "software.amazon.smithy:smithy-validation-model:1.26.0"
+  ]
+}

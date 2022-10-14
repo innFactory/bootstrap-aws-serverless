@@ -1,0 +1,14 @@
+{
+  "version": "2.0",
+  "plugins": {
+    "typescript-ssdk-codegen": {
+      "package": "smithy-api-typescript-gen",
+      "packageVersion": "0.0.1"
+    },
+    "openapi": {
+      "service": "de.innfactory.gen#StringWizard",
+      "protocol": "aws.protocols#restJson1",
+      "apiGatewayType": "REST"
+    }
+  }
+}

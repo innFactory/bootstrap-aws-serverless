@@ -1,5 +1,5 @@
+$version: "2"
 namespace de.innfactory.gen
-
 use aws.auth#sigv4
 use aws.protocols#restJson1
 use smithy.framework#ValidationException
@@ -19,7 +19,10 @@ service StringWizard {
     operations: [Echo, Length, GetRandomMug],
 }
 
+
+
 /// Echo operation that receives input from body.
+
 @http(code: 200, method: "POST", uri: "/echo",)
 operation Echo {
     input: EchoInput,
