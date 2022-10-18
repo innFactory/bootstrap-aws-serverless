@@ -16,50 +16,8 @@ use smithy.framework#ValidationException
 @restJson1
 service StringWizard {
     version: "2018-05-10",
+    resources: [User]
     operations: [Echo, Length, GetRandomMug],
 }
 
 
-
-/// Echo operation that receives input from body.
-
-@http(code: 200, method: "POST", uri: "/echo",)
-operation Echo {
-    input: EchoInput,
-    output: EchoOutput,
-    errors: [ValidationException, PalindromeException],
-}
-
-/// Length operation that receives input from path.
-@readonly
-@http(code: 200, method: "GET", uri: "/length/{message}",)
-operation Length {
-    input: LengthInput,
-    output: LengthOutput,
-    errors: [ValidationException, PalindromeException],
-}
-
-structure EchoInput {
-    message: String,
-}
-
-structure EchoOutput {
-    message: String,
-}
-
-structure LengthInput {
-    @required
-    @httpLabel
-    message: String,
-}
-
-structure LengthOutput {
-    length: Integer,
-}
-
-/// For some reason, this service does not like palindromes!
-@httpError(400)
-@error("client")
-structure PalindromeException {
-    message: String,
-}
