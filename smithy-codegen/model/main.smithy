@@ -17,7 +17,7 @@ use smithy.framework#ValidationException
 service StringWizard {
     version: "2018-05-10",
     resources: [User]
-    operations: [Echo, Length, GetRandomMug],
+    operations: [Echo, Length],
 }
 
 
