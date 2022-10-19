@@ -10,8 +10,8 @@
     "console": "sst console",
     "typecheck": "tsc --noEmit",
     "test": "sst load-config -- vitest run",
-    "codegen:build": "cd smithy-codegen && gradle build && cd build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen && npm install --force && npm run build",
-    "codegen:clean": "cd smithy-codegen && gradle clean",
+    "codegen:build": "cd smithy-codegen && ./gradlew build && cd build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen && npm install --force && npm run build",
+    "codegen:clean": "cd smithy-codegen && ./gradlew clean",
     "codegen": "npm run codegen:clean && npm run codegen:build && npm install smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen"
   },
   "devDependencies": {
