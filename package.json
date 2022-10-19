@@ -19,8 +19,7 @@
     "@aws-smithy/server-apigateway": "^1.0.0-alpha.6",
     "@aws-smithy/server-common": "^1.0.0-alpha.6",
     "aws-lambda": "^1.0.7",
-    "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.1.0"
+    "fp-ts": "^2.13.1"
   },
   "devDependencies": {
     "@serverless-stack/cli": "^1.15.16",
@@ -32,6 +31,8 @@
     "prettier": "^2.7.1",
     "eslint": "^8.25.0",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
-    "@typescript-eslint/parser": "^5.40.1"
+    "@typescript-eslint/parser": "^5.40.1",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0"
   }
 }
