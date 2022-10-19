@@ -4,6 +4,8 @@ node_modules
 # sst
 .sst
 .build
+stacks/index.js
+stacks/MyStack.js
 
 # misc
 .DS_Store
