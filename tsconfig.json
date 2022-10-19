@@ -1,4 +1,28 @@
 {
   "extends": "@tsconfig/node16/tsconfig.json",
-  "include": ["stacks"]
+  "include": ["stacks", "services"],
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "strictNullChecks": true,
+    "jsx": "react",
+    "sourceMap": true,
+    "target": "ES2020",
+    "outDir": "lib",
+    "baseUrl": ".",
+    "paths": {
+      "@utils/*": ["services/utils/*"]
+    },
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": [
+    "node_modules/**/*",
+    ".vscode/**/*",
+    "smithy-codegen/.gradle/*",
+    "smithy-codegen/build/*",
+    "gradle"
+  ]
 }
