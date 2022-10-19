@@ -20,5 +20,8 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[terraform]": {
     "editor.defaultFormatter": "hashicorp.terraform"
-  }
+  },
+  "eslint.validate": ["typescript"],
+  "eslint.enable": true,
+  "typescript.updateImportsOnFileMove.enabled": "always"
 }
