@@ -1,4 +1,4 @@
-import { getEchoHandler } from "smithy-api-typescript-gen";
+import { getEchoHandler } from "@api";
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { EchoOperation } from "./operation";
 import { getApiGatewayHandler } from "@utils/apiGatewayHandler";

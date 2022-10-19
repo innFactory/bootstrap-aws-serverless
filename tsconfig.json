@@ -14,7 +14,10 @@
     "outDir": "lib",
     "baseUrl": ".",
     "paths": {
-      "@utils/*": ["services/utils/*"]
+      "@utils/*": ["services/utils/*"],
+      "@api": [
+        "smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen/src/index.ts"
+      ]
     },
     "allowSyntheticDefaultImports": true
   },

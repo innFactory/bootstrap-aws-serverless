@@ -8,11 +8,7 @@ typescript, nodejs, npm, gradle, smithy-vs code extension
 
 ### Codegen:
 
-to generate the code, run the following commands in the root directory of the project:
-
-```bash
-corepack enable
-```
+to generate the code, run the following command in the root directory of the project:
 
 ```bash
 npm run codegen

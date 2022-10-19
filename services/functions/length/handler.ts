@@ -5,7 +5,7 @@ import {
   LengthServerInput,
   LengthServerOutput,
   PalindromeException,
-} from "smithy-api-typescript-gen";
+} from "@api";
 import { getApiGatewayHandler, HandlerContext } from "@utils/apiGatewayHandler";
 
 const LengthOperation: Operation<

@@ -8,28 +8,25 @@
     "deploy": "npm run check && sst deploy",
     "remove": "sst remove",
     "console": "sst console",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit --noUnusedLocals false --noUnusedParameters false",
     "test": "npm run check && sst load-config -- vitest run",
-    "codegen:build": "cd smithy-codegen && ./gradlew build && cd build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen && npm install && npm run build",
+    "codegen:build": "cd smithy-codegen && ./gradlew build",
     "codegen:clean": "cd smithy-codegen && ./gradlew clean",
-    "codegen": "npm run codegen:clean && npm run codegen:build && npm install smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen"
-  },
-  "devDependencies": {
-    "@serverless-stack/cli": "^1.15.8",
-    "@serverless-stack/resources": "^1.15.8",
-    "@tsconfig/node16": "^1.0.3",
-    "aws-cdk-lib": "2.39.1",
-    "typescript": "4.8.4",
-    "vitest": "^0.23.4",
-    "tsconfig-paths": "^3.9.0",
-    "ts-node": "^10.4.0"
+    "codegen": "npm run codegen:clean && npm run codegen:build && npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen"
   },
   "dependencies": {
     "@aws-smithy/server-apigateway": "^1.0.0-alpha.6",
     "@aws-smithy/server-common": "^1.0.0-alpha.6",
-    "smithy-api-typescript-gen": "file:smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen"
+    "aws-lambda": "^1.0.7",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0"
   },
-  "workspaces": [
-    "services"
-  ]
+  "devDependencies": {
+    "@serverless-stack/cli": "^1.15.16",
+    "@serverless-stack/resources": "^1.15.16",
+    "@tsconfig/node16": "^1.0.3",
+    "aws-cdk-lib": "^2.46.0",
+    "typescript": "^4.8.4",
+    "vitest": "^0.24.3"
+  }
 }
