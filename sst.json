@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "bootstrap-aws-serverless",
   "region": "eu-central-1",
   "main": "stacks/index.ts"
 }

@@ -1,5 +1,6 @@
-import { MyStack } from './MyStack';
+import { ApiStack } from './ApiStack';
 import { App } from '@serverless-stack/resources';
+import { DynamoDbStack } from './DynamoDbStack';
 
 export default function (app: App) {
 	app.setDefaultFunctionProps({
@@ -10,5 +11,5 @@ export default function (app: App) {
 			format: 'cjs',
 		},
 	});
-	app.stack(MyStack);
+	app.stack(ApiStack).stack(DynamoDbStack);
 }

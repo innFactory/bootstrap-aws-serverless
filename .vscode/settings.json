@@ -23,5 +23,6 @@
   },
   "eslint.validate": ["typescript"],
   "eslint.enable": true,
-  "typescript.updateImportsOnFileMove.enabled": "always"
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "js/ts.implicitProjectConfig.experimentalDecorators": true
 }

@@ -2,19 +2,24 @@
   "extends": "@tsconfig/node16/tsconfig.json",
   "include": ["stacks", "services"],
   "compilerOptions": {
-    "lib": ["ESNext"],
+    "lib": ["ES6"],
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
     "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["reflect-metadata"],
     "jsx": "react",
     "sourceMap": true,
     "target": "ES2020",
     "outDir": "lib",
     "baseUrl": ".",
     "paths": {
-      "@utils/*": ["services/utils/*"],
+      "@common/*": ["services/common/*"],
+      "@functions/*": ["services/functions/*"],
+      "@resources/*": ["stacks/resources/*"],
       "@api": [
         "smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen/src/index.ts"
       ]

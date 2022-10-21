@@ -6,7 +6,10 @@ import {
 	LengthServerOutput,
 	PalindromeException,
 } from '@api';
-import { getApiGatewayHandler, HandlerContext } from '@utils/apiGatewayHandler';
+import {
+	getApiGatewayHandler,
+	HandlerContext,
+} from 'services/common/apiGatewayHandler';
 
 const LengthOperation: Operation<
 	LengthServerInput,

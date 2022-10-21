@@ -1,6 +1,6 @@
 import { Operation } from '@aws-smithy/server-common';
 import { EchoServerInput, EchoServerOutput, PalindromeException } from '@api';
-import { HandlerContext } from '../../utils/apiGatewayHandler';
+import { HandlerContext } from '../../common/apiGatewayHandler';
 
 export const EchoOperation: Operation<
 	EchoServerInput,

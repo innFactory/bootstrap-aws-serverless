@@ -1,5 +1,5 @@
 $version: "2"
-namespace de.innfactory.gen
+namespace de.innfactory.bootstrapawsserverless.api
 
 use smithy.framework#ValidationException
 
