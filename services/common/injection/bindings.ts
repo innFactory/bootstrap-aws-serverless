@@ -3,14 +3,12 @@ import { BankRepository } from '@functions/banks/domain/interfaces/bankRepositor
 import { BankService } from '@functions/banks/domain/interfaces/bankService';
 import { BankServiceImpl } from '@functions/banks/domain/services/bankServiceImpl';
 import { BankRepositoryImpl } from '@functions/banks/infrastructure/bankRepositoryImpl';
-import { INJECTABLES } from './injection/injectables';
-import { injector } from './injection/inversify.config';
+import { INJECTABLES } from '../injection/injectables';
+import { injector } from '../injection/inversify.config';
 
-export abstract class LambdaBase {
-	constructor() {
-		injector.bind<BankService>(INJECTABLES.BankService).to(BankServiceImpl);
-		injector
-			.bind<BankRepository>(INJECTABLES.BankRepository)
-			.to(BankRepositoryImpl);
-	}
-}
+export const bindInterfaces = () => {
+	injector.bind<BankService>(INJECTABLES.BankService).to(BankServiceImpl);
+	injector
+		.bind<BankRepository>(INJECTABLES.BankRepository)
+		.to(BankRepositoryImpl);
+};

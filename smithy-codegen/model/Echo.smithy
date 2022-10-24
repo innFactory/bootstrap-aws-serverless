@@ -1,4 +1,4 @@
-$version: "2"
+$version: "2.0"
 namespace de.innfactory.bootstrapawsserverless.api
 
 use smithy.framework#ValidationException
@@ -9,7 +9,7 @@ use smithy.framework#ValidationException
 operation Echo {
     input: EchoInput,
     output: EchoOutput,
-    errors: [ValidationException, PalindromeException],
+    errors: [ValidationException],
 }
 
 structure EchoInput {

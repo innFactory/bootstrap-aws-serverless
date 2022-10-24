@@ -1,33 +1,28 @@
-import {
-	CreateBankInput,
-	Bank,
-	UpdateBankInput,
-	GetBankInput,
-	DeleteBankInput,
-} from '@api';
 import { TaskResult } from '@common/results/taskResult';
 import { BankService } from '../interfaces/bankService';
-import { injectable } from 'inversify';
-import { taskEither } from 'fp-ts';
+import { inject, injectable } from 'inversify';
+import { INJECTABLES } from '@common/injection/injectables';
+import { BankRepository } from '../interfaces/bankRepository';
+import { Bank } from '../model/bank';
 
 @injectable()
 export class BankServiceImpl implements BankService {
-	create(bankInput: CreateBankInput): TaskResult<Bank> {
-		throw new Error('Method not implemented.');
+	@inject(INJECTABLES.BankRepository)
+	private bankRepository!: BankRepository;
+
+	create(bank: Bank): TaskResult<Bank> {
+		return this.bankRepository.create(bank);
 	}
-	update(bankInput: UpdateBankInput): TaskResult<Bank> {
-		throw new Error('Method not implemented.');
+	update(bank: Bank): TaskResult<Bank> {
+		return this.bankRepository.update(bank);
 	}
-	get(bankInput: GetBankInput): TaskResult<Bank> {
-		return taskEither.right({
-			id: '1',
-			name: 'name',
-		});
+	get(bankId: string): TaskResult<Bank> {
+		return this.bankRepository.get(bankId);
 	}
 	list(): TaskResult<Bank[]> {
-		throw new Error('Method not implemented.');
+		return this.bankRepository.list();
 	}
-	delete(bankInput: DeleteBankInput): TaskResult<Bank> {
-		throw new Error('Method not implemented.');
+	delete(bankId: string): TaskResult<Bank> {
+		return this.bankRepository.delete(bankId);
 	}
 }

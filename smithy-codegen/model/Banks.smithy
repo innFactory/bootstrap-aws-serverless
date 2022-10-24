@@ -1,4 +1,4 @@
-$version: "2"
+$version: "2.0"
 namespace de.innfactory.bootstrapawsserverless.api
 use smithy.framework#ValidationException
 
@@ -22,8 +22,8 @@ string BankId
 @http(method: "POST", uri: "/banks")
 operation CreateBankRequest {
     input: CreateBankInput
-    output: Bank
-    errors: [ValidationException]
+    output: BankOutput
+    errors: [ValidationException, BadRequest]
 }
 
 structure CreateBankInput for Banks {
@@ -31,7 +31,7 @@ structure CreateBankInput for Banks {
     $name
 }
 
-structure Bank for Banks {
+structure BankOutput for Banks {
     @required
     $id
     @required
@@ -42,8 +42,8 @@ structure Bank for Banks {
 @http(method: "GET", uri: "/banks/{id}")
 operation GetBankRequest {
     input: GetBankInput
-    output: Bank
-    errors: [ValidationException]
+    output: BankOutput
+    errors: [ValidationException, NotFound]
 }
 
 structure GetBankInput for Banks {
@@ -55,8 +55,8 @@ structure GetBankInput for Banks {
 @http(method: "PATCH", uri: "/banks")
 operation UpdateBankRequest {
     input: UpdateBankInput
-    output: Bank
-    errors: [ValidationException]
+    output: BankOutput
+    errors: [ValidationException, BadRequest, NotFound]
 }
 
 structure UpdateBankInput for Banks {
@@ -69,8 +69,8 @@ structure UpdateBankInput for Banks {
 @http(method: "DELETE", uri: "/banks/{id}")
 operation DeleteBankRequest {
     input: DeleteBankInput
-    output: Bank
-    errors: [ValidationException]
+    output: BankOutput
+    errors: [ValidationException, NotFound]
 }
 
 structure DeleteBankInput for Banks {
@@ -92,5 +92,5 @@ structure BanksResponse {
 }
 
 list BanksResponseList {
-    member: Bank
+    member: BankOutput
 }

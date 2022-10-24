@@ -11,5 +11,5 @@ export default function (app: App) {
 			format: 'cjs',
 		},
 	});
-	app.stack(ApiStack).stack(DynamoDbStack);
+	app.stack(DynamoDbStack).stack(ApiStack);
 }

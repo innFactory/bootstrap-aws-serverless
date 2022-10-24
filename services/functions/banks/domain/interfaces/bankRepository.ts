@@ -1,16 +1,10 @@
-import {
-	Bank,
-	CreateBankInput,
-	DeleteBankInput,
-	GetBankInput,
-	UpdateBankInput,
-} from '@api';
 import { TaskResult } from '@common/results/taskResult';
+import { Bank } from '../model/bank';
 
 export interface BankRepository {
-	create(bankInput: CreateBankInput): TaskResult<Bank>;
-	update(bankInput: UpdateBankInput): TaskResult<Bank>;
-	get(bankInput: GetBankInput): TaskResult<Bank>;
+	create(bank: Bank): TaskResult<Bank>;
+	update(bank: Bank): TaskResult<Bank>;
+	get(bankId: string): TaskResult<Bank>;
 	list(): TaskResult<Bank[]>;
-	delete(bankInput: DeleteBankInput): TaskResult<Bank>;
+	delete(bankId: string): TaskResult<Bank>;
 }

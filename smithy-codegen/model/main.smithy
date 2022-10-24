@@ -1,4 +1,4 @@
-$version: "2"
+$version: "2.0"
 namespace de.innfactory.bootstrapawsserverless.api
 use aws.auth#sigv4
 use aws.protocols#restJson1
@@ -11,6 +11,7 @@ service Api {
     version: "2018-05-10",
     resources: [User, Banks]
     operations: [Echo, Length],
+    errors: [InternalServerError]
 }
 
 
