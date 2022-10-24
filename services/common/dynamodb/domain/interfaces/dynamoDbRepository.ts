@@ -11,10 +11,13 @@ import { errorResults } from '@common/results/errorResults';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { taskEitherExtended } from '@common/utils/taskEitherExtended';
 import { injectable } from 'inversify';
+import { Logger } from '@aws-lambda-powertools/logger';
+import { prettyPrint } from '@common/logging/prettyPrint';
 
 @injectable()
 export abstract class DynamoDBRepository {
 	protected abstract tableKey: string;
+	protected abstract logger: Logger;
 
 	protected query = <T>(
 		paramsCreator: (tableName: string) => DynamoDB.QueryInput,
@@ -26,13 +29,16 @@ export abstract class DynamoDBRepository {
 				(params) =>
 					taskEither.tryCatch(
 						() => {
+							this.logger.debug(
+								`Query with params ${prettyPrint(params)}`
+							);
 							return this.ddb.query(params).promise();
 						},
 						(error) => {
-							const msg = `[${context}] error querying aws with params ${JSON.stringify(
+							const msg = `[${context}] error querying aws with params ${prettyPrint(
 								params
-							)}: ${JSON.stringify(error)}`;
-							console.error(msg);
+							)}: ${prettyPrint(error)}`;
+							this.logger.error(msg);
 							return errorResults.internalServerError(msg);
 						}
 					),
@@ -56,12 +62,17 @@ export abstract class DynamoDBRepository {
 			taskEitherExtended.chainAndMap(
 				(params) =>
 					taskEither.tryCatch(
-						() => this.ddb.scan(params).promise(),
+						() => {
+							this.logger.debug(
+								`Scan with params ${prettyPrint(params)}`
+							);
+							return this.ddb.scan(params).promise();
+						},
 						(error) => {
-							const msg = `[${context}] error scanning aws with params ${JSON.stringify(
+							const msg = `[${context}] error scanning aws with params ${prettyPrint(
 								params
-							)}: ${JSON.stringify(error)}`;
-							console.error(msg);
+							)}: ${prettyPrint(error)}`;
+							this.logger.error(msg);
 							return errorResults.internalServerError(msg);
 						}
 					),
@@ -100,13 +111,11 @@ export abstract class DynamoDBRepository {
 							return await this.ddb.updateItem(params).promise();
 						},
 						(e) => {
-							console.error({
-								msg: `[${context}] update failed with error`,
-								error: e,
-							});
-							return errorResults.internalServerError(
-								`[${context}] update failed with error ${e}`
-							);
+							const msg = `[${context}] update failed with error ${prettyPrint(
+								e
+							)}`;
+							this.logger.error(msg);
+							return errorResults.internalServerError(msg);
 						}
 					),
 				(params, awsResult) => ({ params, awsResult })
@@ -115,10 +124,10 @@ export abstract class DynamoDBRepository {
 				const { awsResult, params } = prevResults;
 				{
 					if (awsResult.$response.error) {
-						const msg = `[${context}] aws error updating ${JSON.stringify(
+						const msg = `[${context}] aws error updating ${prettyPrint(
 							params
-						)}: ${JSON.stringify(awsResult.$response.error)}`;
-						console.error(msg);
+						)}: ${prettyPrint(awsResult.$response.error)}`;
+						this.logger.error(msg);
 						return taskEither.left(
 							errorResults.internalServerError(msg)
 						);
@@ -131,7 +140,7 @@ export abstract class DynamoDBRepository {
 							);
 						} else {
 							const msg = `[${context}] update had no output`;
-							console.debug(msg);
+							this.logger.debug(msg);
 							return taskEither.left(
 								errorResults.internalServerError(msg)
 							);
@@ -237,8 +246,8 @@ export abstract class DynamoDBRepository {
 		(context: string) => (writeRequest: DynamoDB.BatchWriteItemInput) =>
 			taskEither.tryCatch(
 				async () => {
-					console.debug(
-						`[${context}] batch writing ${JSON.stringify(
+					this.logger.debug(
+						`[${context}] batch writing ${prettyPrint(
 							writeRequest
 						)}`
 					);
@@ -247,10 +256,10 @@ export abstract class DynamoDBRepository {
 						.promise();
 				},
 				(error) => {
-					const msg = `[${context}] error batch writing ${JSON.stringify(
+					const msg = `[${context}] error batch writing ${prettyPrint(
 						error
 					)}`;
-					console.error(msg);
+					this.logger.error(msg);
 					return errorResults.internalServerError(msg);
 				}
 			);
@@ -261,10 +270,10 @@ export abstract class DynamoDBRepository {
 			result: PromiseResult<DynamoDB.BatchWriteItemOutput, AWS.AWSError>
 		) => {
 			if (result.$response.error) {
-				const msg = `[${context}] aws error batch writing ${JSON.stringify(
+				const msg = `[${context}] aws error batch writing ${prettyPrint(
 					result.$response.error
 				)}`;
-				console.error(msg);
+				this.logger.error(msg);
 				return taskEither.left(errorResults.internalServerError(msg));
 			} else {
 				return taskEither.right(result.$response.data);
@@ -280,10 +289,10 @@ export abstract class DynamoDBRepository {
 		params: DynamoDB.QueryInput | DynamoDB.ScanInput
 	): TaskResult<T[]> => {
 		if (awsResult.$response.error) {
-			const msg = `[${context}] aws error querying with params ${JSON.stringify(
+			const msg = `[${context}] aws error querying with params ${prettyPrint(
 				params
-			)}: ${JSON.stringify(awsResult.$response.error)}`;
-			console.error(msg);
+			)}: ${prettyPrint(awsResult.$response.error)}`;
+			this.logger.error(msg);
 			return taskEither.left(errorResults.internalServerError(msg));
 		} else {
 			return taskEither.right(

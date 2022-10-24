@@ -9,8 +9,7 @@ use smithy.framework#ValidationException
 @restJson1
 service Api {
     version: "2018-05-10",
-    resources: [User, Banks]
-    operations: [Echo, Length],
+    resources: [Banks]
     errors: [InternalServerError]
 }
 

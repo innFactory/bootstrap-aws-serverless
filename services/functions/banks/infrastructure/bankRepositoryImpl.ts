@@ -7,12 +7,14 @@ import { taskEither } from 'fp-ts';
 import { errorResults } from '@common/results/errorResults';
 import { DynamoDBRepository } from '@common/dynamodb/domain/interfaces/dynamoDbRepository';
 import { TABLE_KEYS } from '@common/dynamodb/tableKeys';
+import { buildLogger } from '@common/logging/loggerFactory';
 
 @injectable()
 export class BankRepositoryImpl
 	extends DynamoDBRepository
 	implements BankRepository
 {
+	protected logger = buildLogger(BankRepositoryImpl.name);
 	protected tableKey = TABLE_KEYS.BANKS_TABLE;
 	private context = 'BanksRepsitory';
 

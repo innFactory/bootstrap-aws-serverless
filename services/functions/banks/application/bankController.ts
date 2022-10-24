@@ -10,10 +10,8 @@ import {
 	ListBanksRequestServerOutput,
 	UpdateBankRequestServerInput,
 	UpdateBankRequestServerOutput,
-	ValidationException,
 } from '@api';
 import { Operation } from '@aws-smithy/server-common';
-import { HandlerContext } from '@common/apiGatewayHandler';
 import { BankService } from '../domain/interfaces/bankService';
 import { INJECTABLES } from '@common/injection/injectables';
 import { lazyInject } from '@common/injection/decorator';
@@ -25,25 +23,31 @@ import {
 	mapGetBankInput,
 	mapUpdateBankInput,
 } from './mapper/banksMapper';
+import { Context } from 'aws-lambda';
+import { buildLogger } from '@common/logging/loggerFactory';
+import { prettyPrint } from '@common/logging/prettyPrint';
 
 class BankController extends BaseController {
+	protected logger = buildLogger(BankController.name);
 	@lazyInject(INJECTABLES.BankService) private bankService!: BankService;
 
 	public list: Operation<
 		ListBanksRequestServerInput,
 		ListBanksRequestServerOutput,
-		HandlerContext
+		Context
 	> = async (input, context) => {
-		console.log(input, context);
+		this.logger.addContext(context);
+		this.logger.info(`Event: ${prettyPrint(input)}`);
 
 		return pipe(this.bankService.list(), this.listToOutput, this.throwLeft);
 	};
 
-	public get: Operation<GetBankInput, BankOutput, HandlerContext> = async (
+	public get: Operation<GetBankInput, BankOutput, Context> = async (
 		input,
 		context
 	) => {
-		console.log(input, context);
+		this.logger.addContext(context);
+		this.logger.info(`Event: ${prettyPrint(input)}`);
 
 		return pipe(
 			mapGetBankInput(input),
@@ -55,27 +59,25 @@ class BankController extends BaseController {
 	public create: Operation<
 		CreateBankRequestServerInput,
 		CreateBankRequestServerOutput,
-		HandlerContext
+		Context
 	> = async (input, context) => {
-		console.log(input, context);
+		this.logger.addContext(context);
+		this.logger.info(`Event: ${prettyPrint(input)}`);
 
-		if (input.name) {
-			return pipe(
-				mapCreateBankInput(input),
-				taskEither.chain((bank) => this.bankService.create(bank)),
-				this.throwLeft
-			);
-		} else {
-			throw new ValidationException({ message: '' });
-		}
+		return pipe(
+			mapCreateBankInput(input),
+			taskEither.chain((bank) => this.bankService.create(bank)),
+			this.throwLeft
+		);
 	};
 
 	public update: Operation<
 		UpdateBankRequestServerInput,
 		UpdateBankRequestServerOutput,
-		HandlerContext
+		Context
 	> = async (input, context) => {
-		console.log(input, context);
+		this.logger.addContext(context);
+		this.logger.info(`Event: ${prettyPrint(input)}`);
 
 		return pipe(
 			mapUpdateBankInput(input),
@@ -87,9 +89,10 @@ class BankController extends BaseController {
 	public delete: Operation<
 		DeleteBankRequestServerInput,
 		DeleteBankRequestServerOutput,
-		HandlerContext
+		Context
 	> = async (input, context) => {
-		console.log(input, context);
+		this.logger.addContext(context);
+		this.logger.info(`Event: ${prettyPrint(input)}`);
 
 		return pipe(
 			mapDeleteBankInput(input),

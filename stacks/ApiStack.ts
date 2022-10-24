@@ -10,9 +10,6 @@ import {
 export function ApiStack(context: StackContext) {
 	const api = new Api(context.stack, 'api', {
 		routes: {
-			'GET 	/length/{message}': 'functions/length/handler.lambdaHandler',
-			'POST 	/echo': 'functions/echo/handler.lambdaHandler',
-
 			'GET 	/banks': getBanks(context),
 			'GET 	/banks/{id}': getBank(context),
 			'POST 	/banks': createBank(context),

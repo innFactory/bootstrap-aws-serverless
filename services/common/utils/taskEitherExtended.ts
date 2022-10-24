@@ -1,9 +1,13 @@
+import { buildLogger } from '@common/logging/loggerFactory';
+import { prettyPrint } from '@common/logging/prettyPrint';
 import { ErrorResult } from '@common/results/errorResult';
 import { StatusCodes } from '@common/results/errorResults';
 import { Result } from '@common/results/result';
 import { TaskResult } from '@common/results/taskResult';
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/lib/function';
+
+const logger = buildLogger('mapResult');
 
 const mapResultWithLeftToRight = <T>(
 	result: Result<unknown>,
@@ -19,10 +23,9 @@ const mapResultWithLeftToRight = <T>(
 					? either.right(mapConditionalLefTo)
 					: either.left(error),
 			() => {
-				console.info({
-					msg: '[mapResultWithLeftToRight] mapRightTo',
-					mapRightTo: mapRightTo,
-				});
+				logger.debug(
+					`[withLeftToRight] mapRightTo ${prettyPrint(mapRightTo)}`
+				);
 				return either.right(mapRightTo);
 			}
 		)
@@ -42,10 +45,9 @@ const mapTaskResultWithLeftToRight = <T>(
 					? either.right(mapConditionalLeftTo)
 					: either.left(error),
 			() => {
-				console.info({
-					msg: '[mapTaskResultWithLeftToRight] mapRightTo',
-					mapRightTo: mapRightTo,
-				});
+				logger.debug(
+					`[withLeftToRight] mapRightTo ${prettyPrint(mapRightTo)}`
+				);
 				return either.right(mapRightTo);
 			}
 		)
