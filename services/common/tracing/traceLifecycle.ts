@@ -57,6 +57,7 @@ const startTrace = (tracer: Tracer) => {
 	// Annotate the subsegment with the cold start & serviceName
 	tracer.annotateColdStart();
 	tracer.addServiceNameAnnotation();
+
 	return { parent, child };
 };
 

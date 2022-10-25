@@ -81,7 +81,7 @@ export class BankRepositoryImpl
 		return pipe(
 			this.get(bankId),
 			taskEither.chainFirst(() =>
-				this.deleteItems([{ bankId: bankId }], BankRepositoryImpl.name)
+				this.deleteItems([{ id: bankId }], BankRepositoryImpl.name)
 			)
 		);
 	}
