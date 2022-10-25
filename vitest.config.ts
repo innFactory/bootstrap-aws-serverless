@@ -12,7 +12,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			'@my-app/core': './services/core',
+			'@bootstrap-aws-serverless': './services',
 		},
 	},
 });

@@ -13,7 +13,8 @@
     "test": "npm run check && sst load-config -- vitest run",
     "codegen:build": "cd smithy-codegen && ./gradlew build",
     "codegen:clean": "cd smithy-codegen && ./gradlew clean",
-    "codegen": "npm run codegen:clean && npm run codegen:build && npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen"
+    "codegen": "npm run codegen:clean && npm run codegen:build && npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen",
+    "codegen:client": "npm run codegen && cd services/test/utils/client && swagger-codegen generate -i ../../../smithy-codegen/build/smithyprojections/smithy-codegen/source/openapi/Api.openapi.json -l typescript-fetch --additional-properties modelPropertyNaming=original"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.3.0",
