@@ -1,4 +1,4 @@
-import { StackContext, Api } from '@serverless-stack/resources';
+import { StackContext, ApiGatewayV1Api } from '@serverless-stack/resources';
 import {
 	createBank,
 	deleteBank,
@@ -8,7 +8,7 @@ import {
 } from '@resources/banks/banksFunctions';
 
 export function ApiStack(context: StackContext) {
-	const api = new Api(context.stack, 'api', {
+	const api = new ApiGatewayV1Api(context.stack, 'api', {
 		routes: {
 			'GET 	/banks': getBanks(context),
 			'GET 	/banks/{id}': getBank(context),
@@ -16,7 +16,7 @@ export function ApiStack(context: StackContext) {
 			'PATCH 	/banks': updateBank(context),
 			'DELETE /banks/{id}': deleteBank(context),
 
-			$default: 'functions/default.handler',
+			'ANY /{proxy+}': 'functions/default.handler',
 		},
 	});
 
