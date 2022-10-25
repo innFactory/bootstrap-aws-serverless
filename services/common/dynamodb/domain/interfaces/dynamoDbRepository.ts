@@ -13,152 +13,176 @@ import { taskEitherExtended } from '@common/utils/taskEitherExtended';
 import { injectable } from 'inversify';
 import { Logger } from '@aws-lambda-powertools/logger';
 import { prettyPrint } from '@common/logging/prettyPrint';
+import { Tracer } from '@aws-lambda-powertools/tracer';
+import { traceTaskResult } from '@common/tracing/traceLifecycle';
 
 @injectable()
 export abstract class DynamoDBRepository {
 	protected abstract tableKey: string;
 	protected abstract logger: Logger;
+	protected abstract tracer: Tracer;
 
 	protected query = <T>(
 		paramsCreator: (tableName: string) => DynamoDB.QueryInput,
 		context: string
 	): TaskResult<T[]> =>
-		pipe(
-			this.createQueryParams(paramsCreator),
-			taskEitherExtended.chainAndMap(
-				(params) =>
-					taskEither.tryCatch(
-						() => {
-							this.logger.debug(
-								`Query with params ${prettyPrint(params)}`
-							);
-							return this.ddb.query(params).promise();
-						},
-						(error) => {
-							const msg = `[${context}] error querying aws with params ${prettyPrint(
-								params
-							)}: ${prettyPrint(error)}`;
-							this.logger.error(msg);
-							return errorResults.internalServerError(msg);
-						}
-					),
-				(params, awsResult) => ({ params, awsResult })
-			),
-			taskEither.chain((prevResults) =>
-				this.processAwsResult<T>(
-					prevResults.awsResult,
-					context,
-					prevResults.params
+		traceTaskResult(
+			pipe(
+				this.createQueryParams(paramsCreator),
+				taskEitherExtended.chainAndMap(
+					(params) =>
+						taskEither.tryCatch(
+							() => {
+								this.logger.debug(
+									`Query with params ${prettyPrint(params)}`
+								);
+								return this.ddb.query(params).promise();
+							},
+							(error) => {
+								const msg = `[${context}] error querying aws with params ${prettyPrint(
+									params
+								)}: ${prettyPrint(error)}`;
+								this.logger.error(msg);
+								return errorResults.internalServerError(msg);
+							}
+						),
+					(params, awsResult) => ({ params, awsResult })
+				),
+				taskEither.chain((prevResults) =>
+					this.processAwsResult<T>(
+						prevResults.awsResult,
+						context,
+						prevResults.params
+					)
 				)
-			)
+			),
+			this.tracer
 		);
 
 	protected scan = <T>(
 		paramsCreator: (tableName: string) => DynamoDB.ScanInput,
 		context: string
 	): TaskResult<T[]> =>
-		pipe(
-			this.createScanParams(paramsCreator),
-			taskEitherExtended.chainAndMap(
-				(params) =>
-					taskEither.tryCatch(
-						() => {
-							this.logger.debug(
-								`Scan with params ${prettyPrint(params)}`
-							);
-							return this.ddb.scan(params).promise();
-						},
-						(error) => {
-							const msg = `[${context}] error scanning aws with params ${prettyPrint(
-								params
-							)}: ${prettyPrint(error)}`;
-							this.logger.error(msg);
-							return errorResults.internalServerError(msg);
-						}
-					),
-				(params, awsResult) => ({ params, awsResult })
-			),
-			taskEither.chain((prevResults) =>
-				this.processAwsResult<T>(
-					prevResults.awsResult,
-					context,
-					prevResults.params
+		traceTaskResult(
+			pipe(
+				this.createScanParams(paramsCreator),
+				taskEitherExtended.chainAndMap(
+					(params) =>
+						taskEither.tryCatch(
+							() => {
+								this.logger.debug(
+									`Scan with params ${prettyPrint(params)}`
+								);
+								return this.ddb.scan(params).promise();
+							},
+							(error) => {
+								const msg = `[${context}] error scanning aws with params ${prettyPrint(
+									params
+								)}: ${prettyPrint(error)}`;
+								this.logger.error(msg);
+								return errorResults.internalServerError(msg);
+							}
+						),
+					(params, awsResult) => ({ params, awsResult })
+				),
+				taskEither.chain((prevResults) =>
+					this.processAwsResult<T>(
+						prevResults.awsResult,
+						context,
+						prevResults.params
+					)
 				)
-			)
+			),
+			this.tracer
 		);
 
 	upsertItems = <T>(items: T[], context: string): TaskResult<void> =>
-		pipe(
-			this.getTableName(),
-			taskEither.chain((tableName) =>
-				taskEither.fromEither(this.wrapInPutRequest(items, tableName))
+		traceTaskResult(
+			pipe(
+				this.getTableName(),
+				taskEither.chain((tableName) =>
+					taskEither.fromEither(
+						this.wrapInPutRequest(items, tableName)
+					)
+				),
+				taskEither.chain(this.batchWrite(context)),
+				taskEither.chain(this.processBatchWriteOutput(context)),
+				taskEither.map(() => undefined)
 			),
-			taskEither.chain(this.batchWrite(context)),
-			taskEither.chain(this.processBatchWriteOutput(context)),
-			taskEither.map(() => undefined)
+			this.tracer
 		);
 
 	protected updateItem = <T>(
 		paramsCreator: (tableName: string) => DynamoDB.UpdateItemInput,
 		context: string
 	): TaskResult<T> =>
-		pipe(
-			this.createUpdateItemInput(paramsCreator),
-			taskEitherExtended.chainAndMap(
-				(params) =>
-					taskEither.tryCatch(
-						async () => {
-							return await this.ddb.updateItem(params).promise();
-						},
-						(e) => {
-							const msg = `[${context}] update failed with error ${prettyPrint(
-								e
-							)}`;
+		traceTaskResult(
+			pipe(
+				this.createUpdateItemInput(paramsCreator),
+				taskEitherExtended.chainAndMap(
+					(params) =>
+						taskEither.tryCatch(
+							async () => {
+								return await this.ddb
+									.updateItem(params)
+									.promise();
+							},
+							(e) => {
+								const msg = `[${context}] update failed with error ${prettyPrint(
+									e
+								)}`;
+								this.logger.error(msg);
+								return errorResults.internalServerError(msg);
+							}
+						),
+					(params, awsResult) => ({ params, awsResult })
+				),
+				taskEither.chain((prevResults) => {
+					const { awsResult, params } = prevResults;
+					{
+						if (awsResult.$response.error) {
+							const msg = `[${context}] aws error updating ${prettyPrint(
+								params
+							)}: ${prettyPrint(awsResult.$response.error)}`;
 							this.logger.error(msg);
-							return errorResults.internalServerError(msg);
-						}
-					),
-				(params, awsResult) => ({ params, awsResult })
-			),
-			taskEither.chain((prevResults) => {
-				const { awsResult, params } = prevResults;
-				{
-					if (awsResult.$response.error) {
-						const msg = `[${context}] aws error updating ${prettyPrint(
-							params
-						)}: ${prettyPrint(awsResult.$response.error)}`;
-						this.logger.error(msg);
-						return taskEither.left(
-							errorResults.internalServerError(msg)
-						);
-					} else {
-						if (awsResult.Attributes) {
-							return taskEither.right(
-								DynamoDB.Converter.unmarshall(
-									awsResult.Attributes
-								) as T
-							);
-						} else {
-							const msg = `[${context}] update had no output`;
-							this.logger.debug(msg);
 							return taskEither.left(
 								errorResults.internalServerError(msg)
 							);
+						} else {
+							if (awsResult.Attributes) {
+								return taskEither.right(
+									DynamoDB.Converter.unmarshall(
+										awsResult.Attributes
+									) as T
+								);
+							} else {
+								const msg = `[${context}] update had no output`;
+								this.logger.debug(msg);
+								return taskEither.left(
+									errorResults.internalServerError(msg)
+								);
+							}
 						}
 					}
-				}
-			})
+				})
+			),
+			this.tracer
 		);
 
 	protected deleteItems = <T>(keys: T[], context: string) =>
-		pipe(
-			this.getTableName(),
-			taskEither.chain((tableName) =>
-				taskEither.fromEither(this.wrapInDeleteRequest(keys, tableName))
+		traceTaskResult(
+			pipe(
+				this.getTableName(),
+				taskEither.chain((tableName) =>
+					taskEither.fromEither(
+						this.wrapInDeleteRequest(keys, tableName)
+					)
+				),
+				taskEither.chain(this.batchWrite(context)),
+				taskEither.chain(this.processBatchWriteOutput(context)),
+				taskEither.map(() => undefined)
 			),
-			taskEither.chain(this.batchWrite(context)),
-			taskEither.chain(this.processBatchWriteOutput(context)),
-			taskEither.map(() => undefined)
+			this.tracer
 		);
 
 	protected getTableName = (): TaskResult<string> =>

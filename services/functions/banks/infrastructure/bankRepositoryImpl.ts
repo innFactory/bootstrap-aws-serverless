@@ -8,6 +8,7 @@ import { errorResults } from '@common/results/errorResults';
 import { DynamoDBRepository } from '@common/dynamodb/domain/interfaces/dynamoDbRepository';
 import { TABLE_KEYS } from '@common/dynamodb/tableKeys';
 import { buildLogger } from '@common/logging/loggerFactory';
+import { buildTracer } from '@common/tracing/tracerFactory';
 
 @injectable()
 export class BankRepositoryImpl
@@ -15,19 +16,21 @@ export class BankRepositoryImpl
 	implements BankRepository
 {
 	protected logger = buildLogger(BankRepositoryImpl.name);
+	protected tracer = buildTracer(BankRepositoryImpl.name);
 	protected tableKey = TABLE_KEYS.BANKS_TABLE;
-	private context = 'BanksRepsitory';
 
 	create(bank: Bank): TaskResult<Bank> {
 		return pipe(
-			this.upsertItems([bank], this.context),
+			this.upsertItems([bank], BankRepositoryImpl.name),
 			taskEither.map(() => bank)
 		);
 	}
 	update(bank: Bank): TaskResult<Bank> {
 		return pipe(
 			this.get(bank.id),
-			taskEither.chainFirst(() => this.upsertItems([bank], this.context))
+			taskEither.chainFirst(() =>
+				this.upsertItems([bank], BankRepositoryImpl.name)
+			)
 		);
 	}
 	get(bankId: string): TaskResult<Bank> {
@@ -45,7 +48,7 @@ export class BankRepositoryImpl
 						},
 					},
 				}),
-				this.context
+				BankRepositoryImpl.name
 			),
 			taskEither.chain((banks) => {
 				if (banks.length == 1) {
@@ -71,14 +74,14 @@ export class BankRepositoryImpl
 			(tableName) => ({
 				TableName: tableName,
 			}),
-			this.context
+			BankRepositoryImpl.name
 		);
 	}
 	delete(bankId: string): TaskResult<Bank> {
 		return pipe(
 			this.get(bankId),
 			taskEither.chainFirst(() =>
-				this.deleteItems([{ bankId: bankId }], this.context)
+				this.deleteItems([{ bankId: bankId }], BankRepositoryImpl.name)
 			)
 		);
 	}

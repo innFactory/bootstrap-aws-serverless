@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.3.0",
+    "@aws-lambda-powertools/tracer": "^1.3.0",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1238.0",
     "fp-ts": "^2.13.1",

@@ -26,9 +26,11 @@ import {
 import { Context } from 'aws-lambda';
 import { buildLogger } from '@common/logging/loggerFactory';
 import { prettyPrint } from '@common/logging/prettyPrint';
+import { buildTracer } from '@common/tracing/tracerFactory';
 
 class BankController extends BaseController {
 	protected logger = buildLogger(BankController.name);
+	tracer = buildTracer(BankController.name);
 	@lazyInject(INJECTABLES.BankService) private bankService!: BankService;
 
 	public list: Operation<
@@ -37,7 +39,7 @@ class BankController extends BaseController {
 		Context
 	> = async (input, context) => {
 		this.logger.addContext(context);
-		this.logger.info(`Event: ${prettyPrint(input)}`);
+		this.logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(this.bankService.list(), this.listToOutput, this.throwLeft);
 	};
@@ -62,7 +64,7 @@ class BankController extends BaseController {
 		Context
 	> = async (input, context) => {
 		this.logger.addContext(context);
-		this.logger.info(`Event: ${prettyPrint(input)}`);
+		this.logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(
 			mapCreateBankInput(input),
@@ -77,7 +79,7 @@ class BankController extends BaseController {
 		Context
 	> = async (input, context) => {
 		this.logger.addContext(context);
-		this.logger.info(`Event: ${prettyPrint(input)}`);
+		this.logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(
 			mapUpdateBankInput(input),
@@ -92,7 +94,7 @@ class BankController extends BaseController {
 		Context
 	> = async (input, context) => {
 		this.logger.addContext(context);
-		this.logger.info(`Event: ${prettyPrint(input)}`);
+		this.logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(
 			mapDeleteBankInput(input),

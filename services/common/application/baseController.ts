@@ -5,10 +5,12 @@ import { TaskResult } from '@common/results/taskResult';
 import { pipe } from 'fp-ts/lib/function';
 import { taskEither } from 'fp-ts';
 import { Logger } from '@aws-lambda-powertools/logger';
+import { Tracer } from '@aws-lambda-powertools/tracer';
 import { prettyPrint } from '@common/logging/prettyPrint';
 
 export abstract class BaseController {
 	protected abstract logger: Logger;
+	abstract tracer: Tracer;
 	constructor() {
 		bindInterfaces();
 	}
