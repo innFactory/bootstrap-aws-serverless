@@ -41,7 +41,11 @@ class BankController extends BaseController {
 		this.logger.addContext(context);
 		this.logger.logEventIfEnabled(prettyPrint(input));
 
-		return pipe(this.bankService.list(), this.listToOutput, this.throwLeft);
+		return pipe(
+			this.bankService.list(),
+			this.listToOutput,
+			this.throwOnLeft
+		);
 	};
 
 	public get: Operation<GetBankInput, BankOutput, Context> = async (
@@ -54,7 +58,7 @@ class BankController extends BaseController {
 		return pipe(
 			mapGetBankInput(input),
 			taskEither.chain((id) => this.bankService.get(id)),
-			this.throwLeft
+			this.throwOnLeft
 		);
 	};
 
@@ -69,7 +73,7 @@ class BankController extends BaseController {
 		return pipe(
 			mapCreateBankInput(input),
 			taskEither.chain((bank) => this.bankService.create(bank)),
-			this.throwLeft
+			this.throwOnLeft
 		);
 	};
 
@@ -84,7 +88,7 @@ class BankController extends BaseController {
 		return pipe(
 			mapUpdateBankInput(input),
 			taskEither.chain((bank) => this.bankService.update(bank)),
-			this.throwLeft
+			this.throwOnLeft
 		);
 	};
 
@@ -99,7 +103,7 @@ class BankController extends BaseController {
 		return pipe(
 			mapDeleteBankInput(input),
 			taskEither.chain((id) => this.bankService.delete(id)),
-			this.throwLeft
+			this.throwOnLeft
 		);
 	};
 }
