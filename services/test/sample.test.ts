@@ -6,11 +6,8 @@ import { Api } from '../../smithy-codegen/build/smithyprojections/smithy-codegen
 describe('BankController', () => {
 	// eslint-disable-next-line
 	// @ts-ignore
-	// const url = Config.API_URL;
-	const client = new Api({
-		endpoint:
-			'https://s6akg43580.execute-api.eu-central-1.amazonaws.com/anderha',
-	});
+	const url = Config.API_URL;
+	const client = new Api({ endpoint: url });
 	let bank: BankOutput;
 
 	it('should create bank', async () => {

@@ -10,7 +10,7 @@
     "console": "sst console",
     "check": "tsc --noEmit --noUnusedLocals false --noUnusedParameters false && npm run lint",
     "lint": "eslint .",
-    "test": "sst load-config -- vitest run",
+    "test": "sst load-config --profile=innfactory-demo -- vitest run",
     "codegen:build": "cd smithy-codegen && ./gradlew build",
     "codegen:clean": "cd smithy-codegen && ./gradlew clean",
     "codegen:install": "npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen && npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-codegen",
