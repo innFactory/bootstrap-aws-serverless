@@ -10,9 +10,4 @@ export default defineConfig({
 	esbuild: {
 		sourcemap: 'both',
 	},
-	resolve: {
-		alias: {
-			'@bootstrap-aws-serverless': './services',
-		},
-	},
 });

@@ -1,4 +1,8 @@
-import { StackContext, ApiGatewayV1Api } from '@serverless-stack/resources';
+import {
+	StackContext,
+	ApiGatewayV1Api,
+	Config,
+} from '@serverless-stack/resources';
 import {
 	createBank,
 	deleteBank,
@@ -18,6 +22,10 @@ export function ApiStack(context: StackContext) {
 
 			'ANY /{proxy+}': 'functions/default.handler',
 		},
+	});
+
+	new Config.Parameter(context.stack, 'API_URL', {
+		value: api.url,
 	});
 
 	context.stack.addOutputs({

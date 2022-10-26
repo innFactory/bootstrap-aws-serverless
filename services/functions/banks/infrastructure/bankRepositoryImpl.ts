@@ -28,9 +28,10 @@ export class BankRepositoryImpl
 	update(bank: Bank): TaskResult<Bank> {
 		return pipe(
 			this.get(bank.id),
-			taskEither.chainFirst(() =>
+			taskEither.chain(() =>
 				this.upsertItems([bank], BankRepositoryImpl.name)
-			)
+			),
+			taskEither.map(() => bank)
 		);
 	}
 	get(bankId: string): TaskResult<Bank> {

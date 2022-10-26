@@ -11,5 +11,9 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {},
-  "ignorePatterns": ["node_modules/", "smithy-codegen/"]
+  "ignorePatterns": [
+    "node_modules/",
+    "smithy-codegen/",
+    "services/test/utils/client/"
+  ]
 }

@@ -9,6 +9,10 @@
       "service": "de.innfactory.bootstrapawsserverless.api#Api",
       "protocol": "aws.protocols#restJson1",
       "apiGatewayType": "REST"
+    },
+    "typescript-codegen": {
+      "package": "bootstrap-aws-serverless-api-client",
+      "packageVersion": "0.0.1"
     }
   }
 }
