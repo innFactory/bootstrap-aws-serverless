@@ -22,6 +22,7 @@ export function ApiStack(context: StackContext) {
 
 			'ANY /{proxy+}': 'functions/default.handler',
 		},
+		cors: true,
 	});
 
 	new Config.Parameter(context.stack, 'API_URL', {

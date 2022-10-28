@@ -25,6 +25,12 @@ export function getApiGatewayHandler(
 
 		const httpRequest = convertEvent(event);
 		const httpResponse = await handler.handle(httpRequest, context);
-		return convertVersion2Response(httpResponse);
+		return convertVersion2Response({
+			...httpResponse,
+			headers: {
+				...httpResponse.headers,
+				'Access-Control-Allow-Origin': '*',
+			},
+		});
 	};
 }
