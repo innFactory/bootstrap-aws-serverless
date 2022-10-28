@@ -22,7 +22,8 @@
       "@resources/*": ["stacks/resources/*"],
       "@api": [
         "smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen/src/index.ts"
-      ]
+      ],
+      "@sst-config": ["stacks/common/config.ts"]
     },
     "allowSyntheticDefaultImports": true
   },

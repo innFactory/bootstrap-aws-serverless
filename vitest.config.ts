@@ -7,6 +7,11 @@ export default defineConfig({
 		testTimeout: 30000,
 	},
 	logLevel: 'info',
+	resolve: {
+		alias: {
+			'@sst-config': './stacks/common/config',
+		},
+	},
 	esbuild: {
 		sourcemap: 'both',
 	},

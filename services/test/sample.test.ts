@@ -1,14 +1,10 @@
 import { BankOutput } from '@api';
-import { Config } from '@serverless-stack/node/config';
 import { describe, expect, it } from 'vitest';
-import { Api } from '../../smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-codegen/src';
+import { config } from '@sst-config';
 import * as api from './utils/client/index';
 
 describe('BankController', () => {
-	// eslint-disable-next-line
-	// @ts-ignore
-	const url = Config.API_URL;
-	//const client = new Api({ endpoint: url });
+	const url = config.API_URL;
 	let bank: BankOutput;
 
 	const client = api.DefaultApiFactory(undefined, url);
@@ -29,7 +25,6 @@ describe('BankController', () => {
 		expect(response.data.name).toBe(bank.name);
 	});
 
-	//Fails with 415 because of: https://github.com/awslabs/smithy-typescript/issues/552
 	it('should have bank in banks', async () => {
 		const response = await client.listBanksRequest({});
 		expect(response.data).toBeDefined();
