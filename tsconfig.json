@@ -31,7 +31,6 @@
     ".vscode/**",
     "smithy-codegen/.gradle/**",
     "smithy-codegen/build/**",
-    "gradle",
-    "services/test/utils/client/**"
+    "gradle"
   ]
 }

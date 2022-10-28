@@ -27,3 +27,7 @@ build
 
 # test client
 services/test/utils/client/*
+
+
+# openapi-generator
+openapitools.json

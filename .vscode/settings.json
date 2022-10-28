@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["esbuild", "gradlew", "ssdk"],
+  "cSpell.words": ["esbuild", "gradlew", "inversify", "ssdk"],
   "editor.formatOnSave": true,
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

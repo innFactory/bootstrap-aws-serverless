@@ -12,11 +12,10 @@
     "lint": "eslint .",
     "test": "sst load-config --profile=innfactory-demo -- vitest run",
     "codegen:build": "cd smithy-codegen && ./gradlew build",
-    "codegen:clean": "cd smithy-codegen && ./gradlew clean",
-    "codegen:install": "npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen && npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-codegen",
-    "codegen": "npm run codegen:clean && npm run codegen:build && npm run codegen:install",
-    "codegen:client": "cd services/test/utils/client && swagger-codegen generate -i ../../../../smithy-codegen/build/smithyprojections/smithy-codegen/source/openapi/Api.openapi.json -l typescript-fetch --additional-properties modelPropertyNaming=original",
-    "codegen:client2": "rm -rf services/test/utils/client/* && openapi-generator-cli generate -i smithy-codegen/build/smithyprojections/smithy-codegen/source/openapi/Api.openapi.json -o services/test/utils/client -g typescript-fetch --additional-properties npmName=api-client,supportsES6=false,useRxJs=false,withInterfaces=true"
+    "codegen:clean": "cd smithy-codegen && ./gradlew clean && rm -rf services/test/utils/client/*",
+    "codegen:install": "npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen",
+    "codegen": "npm run codegen:clean && npm run codegen:build && npm run codegen:install && npm run codegen:client",
+    "codegen:client": "openapi-generator-cli generate -i smithy-codegen/build/smithyprojections/smithy-codegen/source/openapi/Api.openapi.json -o services/test/utils/client -g typescript-axios --additional-properties npmName=api-client,supportsES6=false,useRxJs=false,withInterfaces=true"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.3.0",
