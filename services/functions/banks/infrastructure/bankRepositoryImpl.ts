@@ -79,8 +79,6 @@ export class BankRepositoryImpl
 	): TaskResult<BankListOutput> {
 		const { logger, tracer } = context;
 
-		console.log(input.limit);
-
 		const queryAllOrOne = () => {
 			if (input.queryAll) {
 				return this.getAllScan<Bank>(

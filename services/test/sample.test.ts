@@ -49,8 +49,6 @@ describe('BankController', () => {
 			}
 		);
 		expect(response.data).toBeDefined();
-		console.log(response.data);
-		console.log(bank);
 		expect(
 			(response.data.items ?? []).find(
 				(b) => b.id === bank.id && b.name === bank.name
