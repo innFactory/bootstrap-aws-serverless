@@ -50,15 +50,14 @@ const policy = (
 			}
 
 			const tokenPayload = tokenContext.payload as {
-				vo: string;
-				username: string;
 				sub: string;
+				name: string;
 			};
 
 			logger.debug(prettyPrint(tokenPayload));
 
 			return generateAwsPolicy('SUB', 'ALLOW', event.methodArn, logger, {
-				user: tokenPayload.username,
+				user: tokenPayload.name,
 				id: tokenPayload.sub,
 			});
 		},

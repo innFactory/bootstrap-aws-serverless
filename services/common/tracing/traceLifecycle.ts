@@ -5,6 +5,7 @@ import { Segment, Subsegment } from 'aws-xray-sdk-core';
 import { taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/lib/function';
 import { prettyPrint } from '@common/logging/prettyPrint';
+import { envEnum } from '@sst-env';
 
 export const traceOperation = <I, O, Context>(
 	operation: Operation<I, O, Context>,
@@ -65,9 +66,9 @@ const startTrace = (tracer: Tracer, context: string) => {
 };
 
 const traceResult = <T>(tracer: Tracer, result: T): T => {
-	//TODO: don't trace response in prod
-	//tracer.putMetadata('result', result, context);
-	tracer.addResponseAsMetadata(result, process.env._HANDLER);
+	if (process.env[envEnum.SST_STAGE] !== 'prod') {
+		tracer.addResponseAsMetadata(result, process.env._HANDLER);
+	}
 	return result;
 };
 

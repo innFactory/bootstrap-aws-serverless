@@ -14,8 +14,8 @@ import { InvocationContextWithUser } from '../model/invocationContextWithUser';
 import { buildLogger } from '../../logging/loggerFactory';
 import { buildTracer } from '../../tracing/tracerFactory';
 
-const logger = buildLogger('prolo-service');
-export const tracer = buildTracer('prolo-service');
+const logger = buildLogger('aws-bootstrap');
+export const tracer = buildTracer('aws-bootstrap');
 
 export function getApiGatewayHandler(
 	handler: ServiceHandler<InvocationContextWithUser | InvocationContext>

@@ -11,8 +11,8 @@ import { Either } from 'fp-ts/lib/Either';
 import { ErrorResult } from '@common/results/errorResult';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { Logger } from '@aws-lambda-powertools/logger';
-import { generateAwsPolicy } from '../../generateAwsPolicy';
 import { Keys } from '../../model/keys';
+import { generateAwsPolicy } from '@functions/authorization/generateAwsPolicy';
 
 export const handler: APIGatewayRequestAuthorizerHandler = async (
 	event,
@@ -28,8 +28,7 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (
 
 	return pipe(
 		getJwks,
-		//taskEither.chain((keys) => policy(keys, token, event, logger)),
-		taskEither.chain(() => policy(token, event, logger)),
+		taskEither.chain((keys) => policy(keys, token, event, logger)),
 		taskEither.match(
 			(error) => {
 				logger.debug(prettyPrint(error));
@@ -43,7 +42,7 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (
 };
 
 const policy = (
-	//keys: Keys,
+	keys: Keys,
 	token: string,
 	event: APIGatewayRequestAuthorizerEvent,
 	logger: Logger

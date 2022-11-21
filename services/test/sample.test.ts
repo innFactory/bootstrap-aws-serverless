@@ -2,7 +2,9 @@ import { BankOutput } from '@api';
 import { describe, expect, it } from 'vitest';
 import { config } from '@sst-config';
 import * as api from './utils/client/index';
-import { testJWT } from './utils/testConstants/testJWT';
+import { getJWT } from './utils/getJWT';
+
+const testJWT = 'Bearer ' + getJWT();
 
 describe('BankController', () => {
 	const url = config.API_URL;
@@ -11,6 +13,7 @@ describe('BankController', () => {
 	const client = api.DefaultApiFactory(undefined, url);
 
 	it('should create bank', async () => {
+		console.log('testJWT', testJWT);
 		const response = await client.createBankRequest(
 			{
 				name: 'Testname',
