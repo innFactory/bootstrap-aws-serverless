@@ -6,11 +6,14 @@ use smithy.framework#ValidationException
 
 @title("bootstrap-aws-serverless-api")
 @sigv4(name: "execute-api")
+@httpBearerAuth
 @restJson1
+@auth([httpBearerAuth])
 service Api {
-    version: "2018-05-10",
-    resources: [Banks]
-    errors: [InternalServerError]
+    version: "0.0.1",
+    resources: [Bank]
+    errors: [InternalServerError, NotFound, BadRequest, Unauthorized, Forbidden]
 }
+
 
 

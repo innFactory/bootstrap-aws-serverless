@@ -1,7 +1,7 @@
 import { ErrorResult } from '@common/results/errorResult';
 import { TaskResult } from '@common/results/taskResult';
 import { extractEnv } from '@common/utils/extractEnv';
-import { DynamoDB } from 'aws-sdk';
+import { AWSError, DynamoDB } from 'aws-sdk';
 import { either, taskEither } from 'fp-ts';
 import { Either } from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/lib/function';
@@ -15,17 +15,17 @@ import { Logger } from '@aws-lambda-powertools/logger';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { Tracer } from '@aws-lambda-powertools/tracer';
 import { traceTaskResult } from '@common/tracing/traceLifecycle';
+import { AllDataResponse } from '../model/allDataResponse';
 
 @injectable()
 export abstract class DynamoDBRepository {
 	protected abstract tableKey: string;
-	protected abstract logger: Logger;
-	protected abstract tracer: Tracer;
 
 	protected query = <T>(
 		paramsCreator: (tableName: string) => DynamoDB.QueryInput,
-		context: string
-	): TaskResult<T[]> =>
+		logger: Logger,
+		tracer: Tracer
+	): TaskResult<AllDataResponse<T>> =>
 		traceTaskResult(
 			pipe(
 				this.createQueryParams(paramsCreator),
@@ -33,88 +33,223 @@ export abstract class DynamoDBRepository {
 					(params) =>
 						taskEither.tryCatch(
 							() => {
-								this.logger.debug(
+								logger.debug(
 									`Query with params ${prettyPrint(params)}`
 								);
 								return this.ddb.query(params).promise();
 							},
 							(error) => {
-								const msg = `[${context}] error querying aws with params ${prettyPrint(
+								const msg = `error querying aws with params ${prettyPrint(
 									params
 								)}: ${prettyPrint(error)}`;
-								this.logger.error(msg);
+								logger.error(msg);
 								return errorResults.internalServerError(msg);
 							}
 						),
 					(params, awsResult) => ({ params, awsResult })
 				),
-				taskEither.chain((prevResults) =>
-					this.processAwsResult<T>(
-						prevResults.awsResult,
-						context,
-						prevResults.params
-					)
-				)
+				taskEitherExtended.chainAndAutoMap(
+					({ params, awsResult }) =>
+						this.processAwsResult<T>(awsResult, logger, params),
+					'items'
+				),
+				taskEither.map(({ awsResult, items }) => ({
+					items: items,
+					lastEvaluatedKey: awsResult.LastEvaluatedKey,
+				}))
 			),
-			this.tracer
+			tracer,
+			DynamoDBRepository.name
 		);
 
-	protected scan = <T>(
+	protected getAllQuery = <T>(
+		paramsCreator: (tableName: string) => DynamoDB.QueryInput,
+		allData: T[] = [],
+		logger: Logger,
+		tracer: Tracer
+	): TaskResult<AllDataResponse<T>> => {
+		return traceTaskResult(
+			pipe(
+				this.createQueryParams(paramsCreator),
+				taskEitherExtended.chainAndMap(
+					(params) =>
+						taskEither.tryCatch(
+							() => {
+								logger.debug(
+									`query with params ${prettyPrint(params)}`
+								);
+								return this.ddb.query(params).promise();
+							},
+							(error) => {
+								const msg = `error scanning aws with params ${prettyPrint(
+									params
+								)}: ${prettyPrint(error)}`;
+								logger.error(msg);
+								return errorResults.internalServerError(msg);
+							}
+						),
+					(params, awsResult) => ({ params, awsResult })
+				),
+				taskEitherExtended.chainAndAutoMap(
+					({ params, awsResult }) =>
+						this.processAwsResult<T>(awsResult, logger, params),
+					'items'
+				),
+				taskEither.chain(({ params, awsResult, items }) => {
+					const newAllData = [...allData, ...items];
+					if (awsResult.LastEvaluatedKey) {
+						return this.getAllQuery<T>(
+							() => ({
+								...params,
+								ExclusiveStartKey: awsResult.LastEvaluatedKey,
+							}),
+							newAllData,
+							logger,
+							tracer
+						);
+					}
+					return taskEither.right({
+						items: newAllData,
+						lastEvaluatedKey: undefined,
+					} as AllDataResponse<T>);
+				})
+			),
+			tracer,
+			DynamoDBRepository.name
+		);
+	};
+
+	protected getAllScan = <T>(
 		paramsCreator: (tableName: string) => DynamoDB.ScanInput,
-		context: string
-	): TaskResult<T[]> =>
-		traceTaskResult(
+		allData: T[] = [],
+		logger: Logger,
+		tracer: Tracer
+	): TaskResult<AllDataResponse<T>> => {
+		return traceTaskResult(
 			pipe(
 				this.createScanParams(paramsCreator),
 				taskEitherExtended.chainAndMap(
 					(params) =>
 						taskEither.tryCatch(
 							() => {
-								this.logger.debug(
+								logger.debug(
 									`Scan with params ${prettyPrint(params)}`
 								);
 								return this.ddb.scan(params).promise();
 							},
 							(error) => {
-								const msg = `[${context}] error scanning aws with params ${prettyPrint(
+								const msg = `error scanning aws with params ${prettyPrint(
 									params
 								)}: ${prettyPrint(error)}`;
-								this.logger.error(msg);
+								logger.error(msg);
 								return errorResults.internalServerError(msg);
 							}
 						),
 					(params, awsResult) => ({ params, awsResult })
 				),
-				taskEither.chain((prevResults) =>
-					this.processAwsResult<T>(
-						prevResults.awsResult,
-						context,
-						prevResults.params
-					)
-				)
+				taskEitherExtended.chainAndAutoMap(
+					({ params, awsResult }) =>
+						this.processAwsResult<T>(awsResult, logger, params),
+					'items'
+				),
+				taskEither.chain(({ params, awsResult, items }) => {
+					const newAllData = [...allData, ...items];
+					if (awsResult.LastEvaluatedKey) {
+						return this.getAllScan<T>(
+							() => ({
+								...params,
+								ExclusiveStartKey: awsResult.LastEvaluatedKey,
+							}),
+							newAllData,
+							logger,
+							tracer
+						);
+					}
+					return taskEither.right({
+						items: newAllData,
+						lastEvaluatedKey: undefined,
+					} as AllDataResponse<T>);
+				})
 			),
-			this.tracer
+			tracer,
+			DynamoDBRepository.name
 		);
+	};
 
-	upsertItems = <T>(items: T[], context: string): TaskResult<void> =>
+	protected scan = <T>(
+		paramsCreator: (tableName: string) => DynamoDB.ScanInput,
+		logger: Logger,
+		tracer: Tracer
+	): TaskResult<AllDataResponse<T>> => {
+		return traceTaskResult(
+			pipe(
+				this.createScanParams(paramsCreator),
+
+				taskEitherExtended.chainAndMap(
+					(params) =>
+						taskEither.tryCatch(
+							() => {
+								logger.debug(
+									`Scan with params ${prettyPrint(params)}`
+								);
+								return this.ddb.scan(params).promise();
+							},
+							(error) => {
+								const msg = `error scanning aws with params ${prettyPrint(
+									params
+								)}: ${prettyPrint(error)}`;
+								logger.error(msg);
+								return errorResults.internalServerError(msg);
+							}
+						),
+					(params, awsResult) => ({ params, awsResult })
+				),
+				taskEitherExtended.chainAndAutoMap(
+					(prevResults) =>
+						this.processAwsResult<T>(
+							prevResults.awsResult,
+							logger,
+							prevResults.params
+						),
+					'items'
+				),
+				taskEither.map(({ awsResult, items }) => ({
+					items: items,
+					lastEvaluatedKey: awsResult.LastEvaluatedKey,
+				}))
+			),
+			tracer,
+			DynamoDBRepository.name
+		);
+	};
+
+	upsertItems = <I>(
+		items: I[],
+		logger: Logger,
+		tracer: Tracer
+	): TaskResult<void> =>
 		traceTaskResult(
 			pipe(
 				this.getTableName(),
-				taskEither.chain((tableName) =>
-					taskEither.fromEither(
-						this.wrapInPutRequest(items, tableName)
+				taskEither.map((tableName) =>
+					this.wrapInPutRequest(items, tableName)
+				),
+				taskEither.chain(this.batchWrite(logger)),
+				taskEither.map((writeItemOutputs) =>
+					writeItemOutputs.map((writeItemOutput) =>
+						this.processBatchWriteOutput(logger)(writeItemOutput)
 					)
 				),
-				taskEither.chain(this.batchWrite(context)),
-				taskEither.chain(this.processBatchWriteOutput(context)),
 				taskEither.map(() => undefined)
 			),
-			this.tracer
+			tracer,
+			DynamoDBRepository.name
 		);
 
 	protected updateItem = <T>(
 		paramsCreator: (tableName: string) => DynamoDB.UpdateItemInput,
-		context: string
+		logger: Logger,
+		tracer: Tracer
 	): TaskResult<T> =>
 		traceTaskResult(
 			pipe(
@@ -128,10 +263,10 @@ export abstract class DynamoDBRepository {
 									.promise();
 							},
 							(e) => {
-								const msg = `[${context}] update failed with error ${prettyPrint(
+								const msg = `update failed with error ${prettyPrint(
 									e
 								)}`;
-								this.logger.error(msg);
+								logger.error(msg);
 								return errorResults.internalServerError(msg);
 							}
 						),
@@ -141,10 +276,10 @@ export abstract class DynamoDBRepository {
 					const { awsResult, params } = prevResults;
 					{
 						if (awsResult.$response.error) {
-							const msg = `[${context}] aws error updating ${prettyPrint(
+							const msg = `aws error updating ${prettyPrint(
 								params
 							)}: ${prettyPrint(awsResult.$response.error)}`;
-							this.logger.error(msg);
+							logger.error(msg);
 							return taskEither.left(
 								errorResults.internalServerError(msg)
 							);
@@ -156,8 +291,8 @@ export abstract class DynamoDBRepository {
 									) as T
 								);
 							} else {
-								const msg = `[${context}] update had no output`;
-								this.logger.debug(msg);
+								const msg = `update had no output`;
+								logger.debug(msg);
 								return taskEither.left(
 									errorResults.internalServerError(msg)
 								);
@@ -166,23 +301,27 @@ export abstract class DynamoDBRepository {
 					}
 				})
 			),
-			this.tracer
+			tracer,
+			DynamoDBRepository.name
 		);
 
-	protected deleteItems = <T>(keys: T[], context: string) =>
+	protected deleteItems = <T>(keys: T[], logger: Logger, tracer: Tracer) =>
 		traceTaskResult(
 			pipe(
 				this.getTableName(),
-				taskEither.chain((tableName) =>
-					taskEither.fromEither(
-						this.wrapInDeleteRequest(keys, tableName)
+				taskEither.map((tableName) =>
+					this.wrapInDeleteRequest(keys, tableName)
+				),
+				taskEither.chain(this.batchWrite(logger)),
+				taskEither.map((deleteItemOutputs) =>
+					deleteItemOutputs.map((deleteItemOutput) =>
+						this.processBatchWriteOutput(logger)(deleteItemOutput)
 					)
 				),
-				taskEither.chain(this.batchWrite(context)),
-				taskEither.chain(this.processBatchWriteOutput(context)),
 				taskEither.map(() => undefined)
 			),
-			this.tracer
+			tracer,
+			DynamoDBRepository.name
 		);
 
 	protected getTableName = (): TaskResult<string> =>
@@ -233,71 +372,111 @@ export abstract class DynamoDBRepository {
 	private wrapInPutRequest = <T>(
 		items: T[],
 		tableName: string
-	): Either<ErrorResult, BatchWriteItemInput> =>
-		this.wrapRequestItems(
-			items.map<WriteRequest>((item) => ({
-				PutRequest: {
-					Item: DynamoDB.Converter.marshall(
-						item as { [key: string]: unknown },
-						{
-							convertEmptyValues: false,
-						}
-					),
+	): BatchWriteItemInput[] => {
+		const chunkSize = 25;
+		const writeRequests = [];
+		for (let i = 0; i < items.length; i += chunkSize) {
+			const chunk = items.slice(i, i + chunkSize);
+			writeRequests.push({
+				RequestItems: {
+					[tableName]: chunk.map<WriteRequest>((item) => ({
+						PutRequest: {
+							Item: DynamoDB.Converter.marshall(
+								item as { [key: string]: unknown },
+								{
+									convertEmptyValues: false,
+								}
+							),
+						},
+					})),
 				},
-			})),
-			tableName
-		);
+			});
+		}
+		return writeRequests;
+	};
 
 	private wrapInDeleteRequest = <T>(
-		keys: T[],
+		items: T[],
 		tableName: string
-	): Either<ErrorResult, BatchWriteItemInput> =>
-		this.wrapRequestItems(
-			keys.map<WriteRequest>((key) => ({
-				DeleteRequest: {
-					Key: DynamoDB.Converter.marshall(
-						key as { [key: string]: unknown },
-						{
-							convertEmptyValues: false,
-						}
-					),
+	): BatchWriteItemInput[] => {
+		const chunkSize = 25;
+		const writeRequests = [];
+		for (let i = 0; i < items.length; i += chunkSize) {
+			const chunk = items.slice(i, i + chunkSize);
+			writeRequests.push({
+				RequestItems: {
+					[tableName]: chunk.map<WriteRequest>((item) => ({
+						DeleteRequest: {
+							Key: DynamoDB.Converter.marshall(
+								item as { [key: string]: unknown },
+								{
+									convertEmptyValues: false,
+								}
+							),
+						},
+					})),
 				},
-			})),
-			tableName
-		);
+			});
+		}
+		return writeRequests;
+	};
 
 	private batchWrite =
-		(context: string) => (writeRequest: DynamoDB.BatchWriteItemInput) =>
+		(logger: Logger) => (writeRequests: DynamoDB.BatchWriteItemInput[]) =>
 			taskEither.tryCatch(
 				async () => {
-					this.logger.debug(
-						`[${context}] batch writing ${prettyPrint(
-							writeRequest
-						)}`
+					logger.debug(`batch writing ${prettyPrint(writeRequests)}`);
+					return await Promise.all(
+						writeRequests.map(async (writeRequest) =>
+							this.ddb
+								.batchWriteItem(
+									writeRequest,
+									this.processItemsCallback(logger)
+								)
+								.promise()
+						)
 					);
-					return await this.ddb
-						.batchWriteItem(writeRequest)
-						.promise();
 				},
 				(error) => {
-					const msg = `[${context}] error batch writing ${prettyPrint(
-						error
-					)}`;
-					this.logger.error(msg);
+					const msg = `error batch writing ${prettyPrint(error)}`;
+					logger.error(msg);
 					return errorResults.internalServerError(msg);
 				}
 			);
 
+	private processItemsCallback =
+		(logger: Logger) =>
+		(err: AWSError, data: DynamoDB.BatchWriteItemOutput) => {
+			if (err) {
+				const msg = `error: ${prettyPrint(
+					err
+				)}, when recursively batch writing items: ${prettyPrint(
+					data
+				)} `;
+				logger.error(msg);
+			} else {
+				const requestItems: BatchWriteItemInput = {
+					RequestItems: data.UnprocessedItems ?? {},
+				};
+				if (Object.keys(requestItems.RequestItems).length != 0) {
+					this.ddb.batchWriteItem(
+						requestItems,
+						this.processItemsCallback(logger)
+					);
+				}
+			}
+		};
+
 	private processBatchWriteOutput =
-		(context: string) =>
+		(logger: Logger) =>
 		(
 			result: PromiseResult<DynamoDB.BatchWriteItemOutput, AWS.AWSError>
 		) => {
 			if (result.$response.error) {
-				const msg = `[${context}] aws error batch writing ${prettyPrint(
+				const msg = `aws error batch writing ${prettyPrint(
 					result.$response.error
 				)}`;
-				this.logger.error(msg);
+				logger.error(msg);
 				return taskEither.left(errorResults.internalServerError(msg));
 			} else {
 				return taskEither.right(result.$response.data);
@@ -309,14 +488,14 @@ export abstract class DynamoDBRepository {
 			DynamoDB.QueryOutput | DynamoDB.ScanOutput,
 			AWS.AWSError
 		>,
-		context: string,
+		logger: Logger,
 		params: DynamoDB.QueryInput | DynamoDB.ScanInput
 	): TaskResult<T[]> => {
 		if (awsResult.$response.error) {
-			const msg = `[${context}] aws error querying with params ${prettyPrint(
+			const msg = `aws error querying with params ${prettyPrint(
 				params
 			)}: ${prettyPrint(awsResult.$response.error)}`;
-			this.logger.error(msg);
+			logger.error(msg);
 			return taskEither.left(errorResults.internalServerError(msg));
 		} else {
 			return taskEither.right(

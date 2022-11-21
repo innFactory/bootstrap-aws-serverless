@@ -18,6 +18,9 @@ const internalServerError = (msg = 'Internal Server Error'): ErrorResult =>
 const badGateway = (msg = 'Bad Gateway'): ErrorResult =>
 	createErrorResult(StatusCodes.BAD_GATEWAY, msg);
 
+const forbidden = (msg: string): ErrorResult =>
+	createErrorResult(StatusCodes.FORBIDDEN, msg);
+
 const createErrorResult = (
 	statusCode: StatusCodes,
 	message: string
@@ -31,6 +34,7 @@ const createErrorResult = (
 export enum StatusCodes {
 	BAD_REQUEST = 400,
 	UNAUTHORIZED = 401,
+	FORBIDDEN = 403,
 	NOT_FOUND = 404,
 	PRECONDITION_REQUIRED = 428,
 	INTERNAL_SERVER_ERROR = 500,
@@ -40,6 +44,7 @@ export enum StatusCodes {
 export const errorResults = {
 	badRequest,
 	unauthorized,
+	forbidden,
 	notFound,
 	preconditionRequired,
 	internalServerError,

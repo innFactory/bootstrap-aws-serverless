@@ -22,3 +22,17 @@ structure NotFound {
     @required
     message: String,
 }
+
+@error("client")
+@httpError(401)
+structure Unauthorized {
+    @required
+    message: String,
+}
+
+@error("client")
+@httpError(403)
+structure Forbidden {
+    @required
+    message: String,
+}

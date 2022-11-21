@@ -1,40 +1,41 @@
 import { BankRepository } from '../domain/interfaces/bankRepository';
 import { injectable } from 'inversify';
 import { TaskResult } from '@common/results/taskResult';
-import { Bank } from '../domain/model/bank';
+import { Bank, BankListOutput } from '../domain/model/bank';
 import { pipe } from 'fp-ts/lib/function';
 import { taskEither } from 'fp-ts';
 import { errorResults } from '@common/results/errorResults';
 import { DynamoDBRepository } from '@common/dynamodb/domain/interfaces/dynamoDbRepository';
 import { TABLE_KEYS } from '@common/dynamodb/tableKeys';
-import { buildLogger } from '@common/logging/loggerFactory';
-import { buildTracer } from '@common/tracing/tracerFactory';
+import { InvocationContextWithUser } from '@common/gateway/model/invocationContextWithUser';
+import { ListBanksInput } from '../domain/model/listBanksInput';
 
 @injectable()
 export class BankRepositoryImpl
 	extends DynamoDBRepository
 	implements BankRepository
 {
-	protected logger = buildLogger(BankRepositoryImpl.name);
-	protected tracer = buildTracer(BankRepositoryImpl.name);
 	protected tableKey = TABLE_KEYS.BANKS_TABLE;
 
-	create(bank: Bank): TaskResult<Bank> {
+	create(bank: Bank, context: InvocationContextWithUser): TaskResult<Bank> {
+		const { logger, tracer } = context;
 		return pipe(
-			this.upsertItems([bank], BankRepositoryImpl.name),
+			this.upsertItems([bank], logger, tracer),
 			taskEither.map(() => bank)
 		);
 	}
-	update(bank: Bank): TaskResult<Bank> {
+	update(bank: Bank, context: InvocationContextWithUser): TaskResult<Bank> {
+		const { logger, tracer } = context;
+
 		return pipe(
-			this.get(bank.id),
-			taskEither.chain(() =>
-				this.upsertItems([bank], BankRepositoryImpl.name)
-			),
+			this.get(bank.id, context),
+			taskEither.chain(() => this.upsertItems([bank], logger, tracer)),
 			taskEither.map(() => bank)
 		);
 	}
-	get(bankId: string): TaskResult<Bank> {
+	get(bankId: string, context: InvocationContextWithUser): TaskResult<Bank> {
+		const { logger, tracer } = context;
+
 		return pipe(
 			this.query<Bank>(
 				(tableName) => ({
@@ -49,12 +50,13 @@ export class BankRepositoryImpl
 						},
 					},
 				}),
-				BankRepositoryImpl.name
+				logger,
+				tracer
 			),
 			taskEither.chain((banks) => {
-				if (banks.length == 1) {
-					return taskEither.right(banks[0]);
-				} else if (banks.length == 0) {
+				if (banks.items.length == 1) {
+					return taskEither.right(banks.items[0]);
+				} else if (banks.items.length == 0) {
 					return taskEither.left(
 						errorResults.notFound(
 							`bank with id ${bankId} not found`
@@ -70,19 +72,66 @@ export class BankRepositoryImpl
 			})
 		);
 	}
-	list(): TaskResult<Bank[]> {
-		return this.scan<Bank>(
-			(tableName) => ({
-				TableName: tableName,
-			}),
-			BankRepositoryImpl.name
+
+	list(
+		input: ListBanksInput,
+		context: InvocationContextWithUser
+	): TaskResult<BankListOutput> {
+		const { logger, tracer } = context;
+
+		console.log(input.limit);
+
+		const queryAllOrOne = () => {
+			if (input.queryAll) {
+				return this.getAllScan<Bank>(
+					(tableName) => ({
+						TableName: tableName,
+					}),
+					[],
+					logger,
+					tracer
+				);
+			} else {
+				return this.scan<Bank>(
+					(tableName) => ({
+						TableName: tableName,
+						Limit: input.limit,
+						ExclusiveStartKey: input.lastEvaluatedKey
+							? input.lastEvaluatedKey
+							: undefined,
+					}),
+					logger,
+					tracer
+				);
+			}
+		};
+
+		return pipe(
+			queryAllOrOne(),
+			taskEither.map(
+				(banks) =>
+					<BankListOutput>{
+						items: banks.items,
+						lastEvaluatedKey: banks.lastEvaluatedKey
+							? Buffer.from(
+									JSON.stringify(banks.lastEvaluatedKey)
+							  ).toString('base64')
+							: undefined,
+					}
+			)
 		);
 	}
-	delete(bankId: string): TaskResult<Bank> {
+
+	delete(
+		bankId: string,
+		context: InvocationContextWithUser
+	): TaskResult<Bank> {
+		const { logger, tracer } = context;
+
 		return pipe(
-			this.get(bankId),
+			this.get(bankId, context),
 			taskEither.chainFirst(() =>
-				this.deleteItems([{ id: bankId }], BankRepositoryImpl.name)
+				this.deleteItems([{ id: bankId }], logger, tracer)
 			)
 		);
 	}

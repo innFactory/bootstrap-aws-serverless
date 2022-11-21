@@ -3,7 +3,7 @@ namespace de.innfactory.bootstrapawsserverless.api
 use smithy.framework#ValidationException
 
 
-resource Banks {
+resource Bank {
     identifiers: {
         id: BankId
     }
@@ -26,12 +26,12 @@ operation CreateBankRequest {
     errors: [ValidationException, BadRequest]
 }
 
-structure CreateBankInput for Banks {
+structure CreateBankInput for Bank {
     @required
     $name
 }
 
-structure BankOutput for Banks {
+structure BankOutput for Bank {
     @required
     $id
     @required
@@ -46,7 +46,7 @@ operation GetBankRequest {
     errors: [ValidationException, NotFound]
 }
 
-structure GetBankInput for Banks {
+structure GetBankInput for Bank {
     @required
     @httpLabel
     $id
@@ -59,7 +59,7 @@ operation UpdateBankRequest {
     errors: [ValidationException, BadRequest, NotFound]
 }
 
-structure UpdateBankInput for Banks {
+structure UpdateBankInput for Bank {
     @required
     $id
     $name
@@ -73,7 +73,7 @@ operation DeleteBankRequest {
     errors: [ValidationException, NotFound]
 }
 
-structure DeleteBankInput for Banks {
+structure DeleteBankInput for Bank {
     @required
     @httpLabel
     $id
@@ -82,13 +82,18 @@ structure DeleteBankInput for Banks {
 @readonly
 @http(method: "GET", uri: "/banks")
 operation ListBanksRequest {
+    input: BanksRequest
     output: BanksResponse
     errors: [ValidationException]  
 
 }
 
+structure BanksRequest with [PaginatedInput] {
+}
+
 structure BanksResponse {
-    body: BanksResponseList
+    items: BanksResponseList
+    lastEvaluatedKey: String
 }
 
 list BanksResponseList {
