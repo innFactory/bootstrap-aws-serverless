@@ -5,20 +5,22 @@ import { Segment, Subsegment } from 'aws-xray-sdk-core';
 import { taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/lib/function';
 import { prettyPrint } from '@common/logging/prettyPrint';
+import { envEnum } from '@sst-env';
 
 export const traceOperation = <I, O, Context>(
 	operation: Operation<I, O, Context>,
 	tracer: Tracer
 ): Operation<I, O, Context> => {
 	return (input: I, context: Context) =>
-		tracePromise(operation(input, context), tracer);
+		tracePromise(operation(input, context), tracer, '');
 };
 
 export const traceTaskResult = <T>(
 	taskResult: TaskResult<T>,
-	tracer: Tracer
+	tracer: Tracer,
+	context: string
 ): TaskResult<T> => {
-	const { parent, child } = startTrace(tracer);
+	const { parent, child } = startTrace(tracer, context);
 	return pipe(
 		taskResult,
 		taskEither.map((result) => traceResult(tracer, result)),
@@ -35,9 +37,10 @@ export const traceTaskResult = <T>(
 
 export const tracePromise = <T>(
 	promise: Promise<T>,
-	tracer: Tracer
+	tracer: Tracer,
+	context: string
 ): Promise<T> => {
-	const { parent, child } = startTrace(tracer);
+	const { parent, child } = startTrace(tracer, context);
 
 	return promise
 		.then((result) => traceResult(tracer, result))
@@ -48,12 +51,13 @@ export const tracePromise = <T>(
 		.finally(() => endTrace(tracer, parent, child));
 };
 
-const startTrace = (tracer: Tracer) => {
+const startTrace = (tracer: Tracer, context: string) => {
 	const parent = tracer.getSegment(); // This is the facade segment (the one that is created by AWS Lambda)
 	// Create subsegment for the function & set it as active
-	const child = parent.addNewSubsegment(`## ${process.env._HANDLER}`);
+	const child = parent.addNewSubsegment(
+		`## ${process.env._HANDLER} - ${context}`
+	);
 	tracer.setSegment(child);
-
 	// Annotate the subsegment with the cold start & serviceName
 	tracer.annotateColdStart();
 	tracer.addServiceNameAnnotation();
@@ -62,7 +66,9 @@ const startTrace = (tracer: Tracer) => {
 };
 
 const traceResult = <T>(tracer: Tracer, result: T): T => {
-	tracer.addResponseAsMetadata(result, process.env._HANDLER);
+	if (process.env[envEnum.SST_STAGE] !== 'prod') {
+		tracer.addResponseAsMetadata(result, process.env._HANDLER);
+	}
 	return result;
 };
 

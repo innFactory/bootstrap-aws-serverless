@@ -1,11 +1,12 @@
 import { getGetBankRequestHandler } from '@api';
-import { getApiGatewayHandler } from '@common/apiGatewayHandler';
+import {
+	getApiGatewayHandler,
+	tracer,
+} from '@common/gateway/handler/apiGatewayHandler';
 import { traceOperation } from '@common/tracing/traceLifecycle';
-import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import { bankController } from '../bankController';
 
-export const handler: APIGatewayProxyHandlerV2 = getApiGatewayHandler(
-	getGetBankRequestHandler(
-		traceOperation(bankController.get, bankController.tracer)
-	)
+export const handler: APIGatewayProxyHandler = getApiGatewayHandler(
+	getGetBankRequestHandler(traceOperation(bankController.get, tracer))
 );

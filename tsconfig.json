@@ -23,7 +23,8 @@
       "@api": [
         "smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen/src/index.ts"
       ],
-      "@sst-config": ["stacks/common/config.ts"]
+      "@sst-config": ["stacks/common/config.ts"],
+      "@sst-env": ["stacks/common/envEnum.ts"]
     },
     "allowSyntheticDefaultImports": true
   },

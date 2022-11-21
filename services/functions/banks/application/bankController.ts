@@ -21,89 +21,91 @@ import {
 	mapCreateBankInput,
 	mapDeleteBankInput,
 	mapGetBankInput,
+	mapListBankInput,
 	mapUpdateBankInput,
 } from './mapper/banksMapper';
-import { Context } from 'aws-lambda';
-import { buildLogger } from '@common/logging/loggerFactory';
 import { prettyPrint } from '@common/logging/prettyPrint';
-import { buildTracer } from '@common/tracing/tracerFactory';
+import { InvocationContextWithUser } from '@common/gateway/model/invocationContextWithUser';
 
 class BankController extends BaseController {
-	protected logger = buildLogger(BankController.name);
-	tracer = buildTracer(BankController.name);
 	@lazyInject(INJECTABLES.BankService) private bankService!: BankService;
 
 	public list: Operation<
 		ListBanksRequestServerInput,
 		ListBanksRequestServerOutput,
-		Context
+		InvocationContextWithUser
 	> = async (input, context) => {
-		this.logger.addContext(context);
-		this.logger.logEventIfEnabled(prettyPrint(input));
+		const { logger } = context;
+		logger.addContext(context);
+		logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(
-			this.bankService.list(),
-			this.listToOutput,
-			this.throwOnLeft
+			mapListBankInput(input),
+			taskEither.chain((banksInput) =>
+				this.bankService.list(banksInput, context)
+			),
+			this.throwOnLeft(logger)
 		);
 	};
 
-	public get: Operation<GetBankInput, BankOutput, Context> = async (
-		input,
-		context
-	) => {
-		this.logger.addContext(context);
-		this.logger.info(`Event: ${prettyPrint(input)}`);
+	public get: Operation<GetBankInput, BankOutput, InvocationContextWithUser> =
+		async (input, context) => {
+			const { logger } = context;
+			logger.addContext(context);
+			logger.logEventIfEnabled(prettyPrint(input));
 
-		return pipe(
-			mapGetBankInput(input),
-			taskEither.chain((id) => this.bankService.get(id)),
-			this.throwOnLeft
-		);
-	};
+			return pipe(
+				mapGetBankInput(input),
+				taskEither.chain((id) => this.bankService.get(id, context)),
+				this.throwOnLeft(logger)
+			);
+		};
 
 	public create: Operation<
 		CreateBankRequestServerInput,
 		CreateBankRequestServerOutput,
-		Context
+		InvocationContextWithUser
 	> = async (input, context) => {
-		this.logger.addContext(context);
-		this.logger.logEventIfEnabled(prettyPrint(input));
+		const { logger } = context;
+		logger.addContext(context);
+		logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(
 			mapCreateBankInput(input),
-			taskEither.chain((bank) => this.bankService.create(bank)),
-			this.throwOnLeft
+			taskEither.chain((bank) => this.bankService.create(bank, context)),
+			this.throwOnLeft(logger)
 		);
 	};
 
 	public update: Operation<
 		UpdateBankRequestServerInput,
 		UpdateBankRequestServerOutput,
-		Context
+		InvocationContextWithUser
 	> = async (input, context) => {
-		this.logger.addContext(context);
-		this.logger.logEventIfEnabled(prettyPrint(input));
+		const { logger } = context;
+		logger.addContext(context);
+		logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(
 			mapUpdateBankInput(input),
-			taskEither.chain((bank) => this.bankService.update(bank)),
-			this.throwOnLeft
+			taskEither.chain((bank) => this.bankService.update(bank, context)),
+			this.throwOnLeft(logger)
 		);
 	};
 
 	public delete: Operation<
 		DeleteBankRequestServerInput,
 		DeleteBankRequestServerOutput,
-		Context
+		InvocationContextWithUser
 	> = async (input, context) => {
-		this.logger.addContext(context);
-		this.logger.logEventIfEnabled(prettyPrint(input));
+		const { logger } = context;
+		logger.addContext(context);
+		logger.logEventIfEnabled(prettyPrint(input));
 
 		return pipe(
 			mapDeleteBankInput(input),
-			taskEither.chain((id) => this.bankService.delete(id)),
-			this.throwOnLeft
+			taskEither.chain((id) => this.bankService.delete(id, context)),
+			this.throwOnLeft(logger)
 		);
 	};
 }
