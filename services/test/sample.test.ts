@@ -2,9 +2,6 @@ import { BankOutput } from '@api';
 import { describe, expect, it } from 'vitest';
 import { config } from '@sst-config';
 import * as api from './utils/client/index';
-import { getJWT } from './utils/getJWT';
-
-const testJWT = 'Bearer ' + getJWT();
 
 describe('BankController', () => {
 	const url = config.API_URL;
@@ -13,28 +10,16 @@ describe('BankController', () => {
 	const client = api.DefaultApiFactory(undefined, url);
 
 	it('should create bank', async () => {
-		console.log('testJWT', testJWT);
-		const response = await client.createBankRequest(
-			{
-				name: 'Testname',
-			},
-			{
-				headers: {
-					authorization: testJWT,
-				},
-			}
-		);
+		const response = await client.createBankRequest({
+			name: 'Testname',
+		});
 		bank = response.data;
 
 		expect(response.data.name).toBe('Testname');
 	});
 
 	it('should get bank', async () => {
-		const response = await client.getBankRequest(bank.id ?? '', {
-			headers: {
-				authorization: testJWT,
-			},
-		});
+		const response = await client.getBankRequest(bank.id ?? '');
 
 		expect(response.data.id).toBe(bank.id);
 		expect(response.data.name).toBe(bank.name);
@@ -44,12 +29,7 @@ describe('BankController', () => {
 		const response = await client.listBanksRequest(
 			undefined,
 			undefined,
-			undefined,
-			{
-				headers: {
-					authorization: testJWT,
-				},
-			}
+			undefined
 		);
 		expect(response.data).toBeDefined();
 		expect(
@@ -60,28 +40,17 @@ describe('BankController', () => {
 	});
 
 	it('should update bank', async () => {
-		const response = await client.updateBankRequest(
-			{
-				id: bank.id ?? '',
-				name: 'Testname edited',
-			},
-			{
-				headers: {
-					authorization: testJWT,
-				},
-			}
-		);
+		const response = await client.updateBankRequest({
+			id: bank.id ?? '',
+			name: 'Testname edited',
+		});
 
 		expect(response.data.id).toBe(bank.id);
 		expect(response.data.name).toBe('Testname edited');
 	});
 
 	it('should delete bank', async () => {
-		const response = await client.deleteBankRequest(bank.id ?? '', {
-			headers: {
-				authorization: testJWT,
-			},
-		});
+		const response = await client.deleteBankRequest(bank.id ?? '');
 
 		expect(response.data.id).toBe(bank.id);
 	});

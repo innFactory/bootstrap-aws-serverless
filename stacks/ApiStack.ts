@@ -1,8 +1,4 @@
-import {
-	StackContext,
-	ApiGatewayV1Api,
-	Config,
-} from '@serverless-stack/resources';
+import { StackContext, ApiGatewayV1Api, Config } from 'sst/constructs';
 
 import {
 	createBank,

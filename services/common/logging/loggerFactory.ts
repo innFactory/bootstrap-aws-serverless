@@ -1,5 +1,8 @@
 import { createLogger, Logger } from '@aws-lambda-powertools/logger';
-import { ConstructorOptions } from '@aws-lambda-powertools/logger/lib/types';
+import {
+	ConstructorOptions,
+	LogLevel,
+} from '@aws-lambda-powertools/logger/lib/types';
 import { envEnum } from '@sst-env';
 import { isDeployedStage } from 'stacks/common/isOfStage';
 import { CustomLogFormatter } from './customLogFormatter';
@@ -11,7 +14,7 @@ export const buildLogger = (serviceName: string, logger?: Logger) => {
 
 	const options: ConstructorOptions = {
 		serviceName: serviceName,
-		logLevel: logLevel,
+		logLevel: logLevel as LogLevel,
 		logFormatter: isDeployedStage(stage)
 			? new CustomLogFormatter()
 			: new LocalCustomLogFormatter(),
