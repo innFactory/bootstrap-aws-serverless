@@ -1,4 +1,4 @@
-import { KeysStack } from '@resources/keys/keysStack';
+import { KeysStack } from 'stacks/KeysStack';
 import { StackContext, use } from 'sst/constructs';
 import { createDefaultFunction } from 'stacks/common/defaultFunction';
 import { DynamoDbStack } from 'stacks/DynamoDbStack';

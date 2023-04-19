@@ -3,7 +3,8 @@ import { App } from 'sst/constructs';
 import { DynamoDbStack } from './DynamoDbStack';
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { isDev, isProd, isStaging } from './common/isOfStage';
-import { KeysStack } from '@resources/keys/keysStack';
+import { KeysStack } from 'stacks/KeysStack';
+import { AlarmStack } from './AlarmStack';
 
 export default function (app: App) {
 	if (!isProd(app.stage)) {
@@ -17,6 +18,10 @@ export default function (app: App) {
 			format: 'cjs',
 		},
 	});
+
+	if (isProd(app.stage)) {
+		app.stack(AlarmStack);
+	}
 
 	app.stack(KeysStack).stack(DynamoDbStack).stack(ApiStack);
 }

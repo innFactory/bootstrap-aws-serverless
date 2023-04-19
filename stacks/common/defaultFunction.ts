@@ -7,9 +7,13 @@ export const createDefaultFunction = (
 	props: FunctionProps
 ) =>
 	new Function(context.stack, id, {
-		timeout: '30 seconds',
-		logRetention: isDeployedStage(context.stack.stage)
-			? undefined
-			: 'two_weeks',
+		...defaultFunctionProps(context),
 		...props,
 	});
+
+export const defaultFunctionProps = (context: StackContext): FunctionProps => ({
+	timeout: '30 seconds',
+	logRetention: isDeployedStage(context.stack.stage)
+		? undefined
+		: 'two_weeks',
+});

@@ -1,4 +1,4 @@
-import { KeysStack } from '@resources/keys/keysStack';
+import { KeysStack } from 'stacks/KeysStack';
 import { Table, TableProps, use } from 'sst/constructs';
 import { TableProps as CdkTableProps } from 'aws-cdk-lib/aws-dynamodb';
 import { TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
