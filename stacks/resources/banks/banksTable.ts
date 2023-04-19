@@ -1,14 +1,14 @@
-import { TABLE_KEYS } from '@common/dynamodb/tableKeys';
-import { Stack, Table } from 'sst/constructs';
+import { Stack } from 'sst/constructs';
+import { createEncryptedTable } from 'stacks/common/encryptedTable';
 
-const banksTable = (stack: Stack) => {
-	return new Table(stack, TABLE_KEYS.BANKS_TABLE, {
+const createBankTable = (stack: Stack) => {
+	return createEncryptedTable(stack, 'banks', {
 		fields: {
+			// Only add indexed fields
 			id: 'string',
-			name: 'string',
 		},
 		primaryIndex: { partitionKey: 'id' },
 	});
 };
 
-export default banksTable;
+export default createBankTable;

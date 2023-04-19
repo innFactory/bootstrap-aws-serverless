@@ -3,6 +3,7 @@ import { App } from 'sst/constructs';
 import { DynamoDbStack } from './DynamoDbStack';
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { isDev, isProd, isStaging } from './common/isOfStage';
+import { KeysStack } from '@resources/keys/keysStack';
 
 export default function (app: App) {
 	if (!isProd(app.stage)) {
@@ -17,7 +18,7 @@ export default function (app: App) {
 		},
 	});
 
-	app.stack(DynamoDbStack).stack(ApiStack);
+	app.stack(KeysStack).stack(DynamoDbStack).stack(ApiStack);
 }
 
 const getEnvVars = (stage: string) => {
