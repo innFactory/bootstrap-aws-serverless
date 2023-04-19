@@ -29,14 +29,17 @@ export class DynamoDBRepositoryTestMock
 	get = (
 		queryParams: {
 			tableKey: string;
-			itemKeys: DDBKeys;
+			itemKeys?: DDBKeys;
 			indexName?: string | undefined;
 		},
 		_context: InvocationContext // eslint-disable-line @typescript-eslint/no-unused-vars
 	): TaskResult<AllDataResponse<unknown>> => {
 		this.reset();
 		return taskEither.right({
-			items: this.filter(queryParams.tableKey, queryParams.itemKeys),
+			items: this.filter(
+				queryParams.tableKey,
+				queryParams.itemKeys ?? {}
+			),
 			lastEvaluatedKey: undefined,
 		});
 	};
@@ -55,14 +58,17 @@ export class DynamoDBRepositoryTestMock
 	getAll = (
 		queryParams: {
 			tableKey: string;
-			itemKeys: DDBKeys;
+			itemKeys?: DDBKeys;
 			indexName?: string | undefined;
 		},
 		_context: InvocationContext // eslint-disable-line @typescript-eslint/no-unused-vars
 	): TaskResult<AllDataResponse<unknown>> => {
 		this.reset();
 		return taskEither.right({
-			items: this.filter(queryParams.tableKey, queryParams.itemKeys),
+			items: this.filter(
+				queryParams.tableKey,
+				queryParams.itemKeys ?? {}
+			),
 			lastEvaluatedKey: undefined,
 		});
 	};
