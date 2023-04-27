@@ -1,13 +1,14 @@
-import { Stack, Table } from '@serverless-stack/resources';
+import { Stack } from 'sst/constructs';
+import { createEncryptedTable } from 'stacks/common/encryptedTable';
 
-const banksTable = (stack: Stack) => {
-	return new Table(stack, 'banks', {
+const createBankTable = (stack: Stack) => {
+	return createEncryptedTable(stack, 'banks', {
 		fields: {
+			// Only add indexed fields
 			id: 'string',
-			name: 'string',
 		},
 		primaryIndex: { partitionKey: 'id' },
 	});
 };
 
-export default banksTable;
+export default createBankTable;

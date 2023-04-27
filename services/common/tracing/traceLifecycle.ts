@@ -6,6 +6,7 @@ import { taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/lib/function';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { envEnum } from '@sst-env';
+import { isDev } from 'stacks/common/isOfStage';
 
 export const traceOperation = <I, O, Context>(
 	operation: Operation<I, O, Context>,
@@ -66,7 +67,7 @@ const startTrace = (tracer: Tracer, context: string) => {
 };
 
 const traceResult = <T>(tracer: Tracer, result: T): T => {
-	if (process.env[envEnum.SST_STAGE] !== 'prod') {
+	if (isDev(process.env[envEnum.SST_STAGE])) {
 		tracer.addResponseAsMetadata(result, process.env._HANDLER);
 	}
 	return result;

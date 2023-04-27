@@ -1,28 +1,15 @@
-import {
-	StackContext,
-	ApiGatewayV1Api,
-	Config,
-} from '@serverless-stack/resources';
+import { StackContext, ApiGatewayV1Api, Config } from 'sst/constructs';
 
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
-import { authorizer } from '@resources/authorization/authorizerFunction';
-import { createBank, deleteBank, getBank, getBanks, updateBank } from '@resources/banks/banksFunctions';
+import {
+	createBank,
+	deleteBank,
+	getBank,
+	getBanks,
+	updateBank,
+} from '@resources/banks/banksFunctions';
 
 export function ApiStack(context: StackContext) {
 	const api = new ApiGatewayV1Api(context.stack, 'api', {
-		authorizers: {
-			europaceAuthorizer: {
-				type: 'lambda_request',
-				function: authorizer(context),
-				identitySources: [
-					apigateway.IdentitySource.header('Authorization'),
-				],
-			},
-		},
-		defaults: {
-			authorizer: 'europaceAuthorizer',
-		},
-
 		routes: {
 			'GET 	/banks': getBanks(context),
 			'GET 	/banks/{id}': getBank(context),

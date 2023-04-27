@@ -11,7 +11,7 @@ import { Bank } from '@functions/banks/domain/model/bank';
 import { ListBanksInput } from '@functions/banks/domain/model/listBanksInput';
 import { DynamoDB } from 'aws-sdk';
 import { taskEither } from 'fp-ts';
-import { v4, validate } from 'uuid';
+import { v4 } from 'uuid';
 
 export const mapGetBankInput = (input: GetBankInput): TaskResult<string> => {
 	if (input.id) {
@@ -53,7 +53,7 @@ export const mapCreateBankInput = (
 export const mapUpdateBankInput = (
 	input: UpdateBankRequestServerInput
 ): TaskResult<Bank> => {
-	if (input.name && input.id && validate(input.id)) {
+	if (input.name && input.id) {
 		return taskEither.right({
 			id: input.id,
 			name: input.name,

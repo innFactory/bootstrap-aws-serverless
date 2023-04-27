@@ -1,6 +1,6 @@
-import { Config, ConfigType } from '@serverless-stack/node/config';
+import { Config, ConfigTypes } from 'sst/node/config';
 
-interface CustomConfig extends ConfigType {
+interface CustomConfig extends ConfigTypes {
 	API_URL: string;
 	APP: string;
 	STAGE: string;

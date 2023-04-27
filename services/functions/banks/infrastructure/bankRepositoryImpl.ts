@@ -1,57 +1,70 @@
 import { BankRepository } from '../domain/interfaces/bankRepository';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { TaskResult } from '@common/results/taskResult';
-import { Bank, BankListOutput } from '../domain/model/bank';
+import {
+	Bank,
+	BankDDB,
+	BankDDBItem,
+	BankListOutput,
+} from '../domain/model/bank';
 import { pipe } from 'fp-ts/lib/function';
 import { taskEither } from 'fp-ts';
 import { errorResults } from '@common/results/errorResults';
-import { DynamoDBRepository } from '@common/dynamodb/domain/interfaces/dynamoDbRepository';
+import {
+	DDBKey,
+	DynamoDBRepository,
+} from '@common/dynamodb/domain/interfaces/dynamoDbRepository';
 import { TABLE_KEYS } from '@common/dynamodb/tableKeys';
 import { InvocationContextWithUser } from '@common/gateway/model/invocationContextWithUser';
 import { ListBanksInput } from '../domain/model/listBanksInput';
+import { INJECTABLES } from '@common/injection/injectables';
+import { mapBankDomainToDDB } from './mapper/mapBankDomainToDDB';
+import { mapBankDDBToDomain } from './mapper/mapBankDDBToDomain';
 
 @injectable()
-export class BankRepositoryImpl
-	extends DynamoDBRepository
-	implements BankRepository
-{
-	protected tableKey = TABLE_KEYS.BANKS_TABLE;
+export class BankRepositoryImpl implements BankRepository {
+	@inject(INJECTABLES.DynamoDBRepository)
+	private dynamoDBRepository!: DynamoDBRepository<BankDDBItem, BankDDB>;
+
+	private tableKey: string = TABLE_KEYS.BANKS_TABLE;
 
 	create(bank: Bank, context: InvocationContextWithUser): TaskResult<Bank> {
-		const { logger, tracer } = context;
 		return pipe(
-			this.upsertItems([bank], logger, tracer),
+			this.dynamoDBRepository.upsert(
+				{
+					tableKey: this.tableKey,
+					items: [mapBankDomainToDDB(bank)],
+				},
+				context
+			),
 			taskEither.map(() => bank)
 		);
 	}
 	update(bank: Bank, context: InvocationContextWithUser): TaskResult<Bank> {
-		const { logger, tracer } = context;
-
 		return pipe(
 			this.get(bank.id, context),
-			taskEither.chain(() => this.upsertItems([bank], logger, tracer)),
+			taskEither.chain(() =>
+				this.dynamoDBRepository.upsert(
+					{
+						tableKey: this.tableKey,
+						items: [mapBankDomainToDDB(bank)],
+					},
+					context
+				)
+			),
 			taskEither.map(() => bank)
 		);
 	}
 	get(bankId: string, context: InvocationContextWithUser): TaskResult<Bank> {
-		const { logger, tracer } = context;
-
 		return pipe(
-			this.query<Bank>(
-				(tableName) => ({
-					TableName: tableName,
-					KeyConditionExpression: '#id = :id',
-					ExpressionAttributeNames: {
-						'#id': 'id',
+			this.dynamoDBRepository.get(
+				{
+					tableKey: this.tableKey,
+					itemKeys: {
+						id: new DDBKey(bankId),
 					},
-					ExpressionAttributeValues: {
-						':id': {
-							S: bankId,
-						},
-					},
-				}),
-				logger,
-				tracer
+				},
+				context
 			),
 			taskEither.chain((banks) => {
 				if (banks.items.length == 1) {
@@ -77,46 +90,35 @@ export class BankRepositoryImpl
 		input: ListBanksInput,
 		context: InvocationContextWithUser
 	): TaskResult<BankListOutput> {
-		const { logger, tracer } = context;
-
 		const queryAllOrOne = () => {
 			if (input.queryAll) {
-				return this.getAllScan<Bank>(
-					(tableName) => ({
-						TableName: tableName,
-					}),
-					[],
-					logger,
-					tracer
+				return this.dynamoDBRepository.getAll(
+					{
+						tableKey: this.tableKey,
+					},
+					context
 				);
 			} else {
-				return this.scan<Bank>(
-					(tableName) => ({
-						TableName: tableName,
-						Limit: input.limit,
-						ExclusiveStartKey: input.lastEvaluatedKey
-							? input.lastEvaluatedKey
-							: undefined,
-					}),
-					logger,
-					tracer
+				return this.dynamoDBRepository.get(
+					{
+						tableKey: this.tableKey,
+						limit: input.limit,
+						cursor: input.lastEvaluatedKey,
+					},
+					context
 				);
 			}
 		};
 
 		return pipe(
 			queryAllOrOne(),
-			taskEither.map(
-				(banks) =>
-					<BankListOutput>{
-						items: banks.items,
-						lastEvaluatedKey: banks.lastEvaluatedKey
-							? Buffer.from(
-									JSON.stringify(banks.lastEvaluatedKey)
-							  ).toString('base64')
-							: undefined,
-					}
-			)
+			taskEither.map((banksDDB) => {
+				const banksList: BankListOutput = {
+					items: banksDDB.items.map(mapBankDDBToDomain),
+					lastEvaluatedKey: banksDDB.lastEvaluatedKey,
+				};
+				return banksList;
+			})
 		);
 	}
 
@@ -124,12 +126,16 @@ export class BankRepositoryImpl
 		bankId: string,
 		context: InvocationContextWithUser
 	): TaskResult<Bank> {
-		const { logger, tracer } = context;
-
 		return pipe(
 			this.get(bankId, context),
 			taskEither.chainFirst(() =>
-				this.deleteItems([{ id: bankId }], logger, tracer)
+				this.dynamoDBRepository.delete(
+					{
+						tableKey: this.tableKey,
+						itemsKeys: [{ id: new DDBKey(bankId) }],
+					},
+					context
+				)
 			)
 		);
 	}

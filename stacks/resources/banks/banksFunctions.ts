@@ -1,62 +1,74 @@
-import { StackContext, Function, use } from '@serverless-stack/resources';
+import { KeysStack } from 'stacks/KeysStack';
+import { StackContext, use } from 'sst/constructs';
+import { createDefaultFunction } from 'stacks/common/defaultFunction';
 import { DynamoDbStack } from 'stacks/DynamoDbStack';
 
 export const getBank = (context: StackContext) => {
+	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, 'GetBank', {
-		handler: 'functions/banks/application/handler/get.handler',
+	return createDefaultFunction(context, 'GetBank', {
+		handler: 'services/functions/banks/application/handler/get.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
 		},
-		permissions: [bankTable],
+		permissions: withDynamoDBKeyPolicy([]),
+		bind: [bankTable],
 	});
 };
 
 export const getBanks = (context: StackContext) => {
+	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, 'GetBanks', {
-		handler: 'functions/banks/application/handler/list.handler',
+	return createDefaultFunction(context, 'GetBanks', {
+		handler: 'services/functions/banks/application/handler/list.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
 		},
-		permissions: [bankTable],
+		permissions: withDynamoDBKeyPolicy([]),
+		bind: [bankTable],
 	});
 };
 
 export const createBank = (context: StackContext) => {
+	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, 'CreateBank', {
-		handler: 'functions/banks/application/handler/create.handler',
+	return createDefaultFunction(context, 'CreateBank', {
+		handler: 'services/functions/banks/application/handler/create.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
 		},
-		permissions: [bankTable],
+		permissions: withDynamoDBKeyPolicy([]),
+		bind: [bankTable],
 	});
 };
 
 export const updateBank = (context: StackContext) => {
+	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, 'UpdateBank', {
-		handler: 'functions/banks/application/handler/update.handler',
+	return createDefaultFunction(context, 'UpdateBank', {
+		handler: 'services/functions/banks/application/handler/update.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
 		},
-		permissions: [bankTable],
+		permissions: withDynamoDBKeyPolicy([]),
+		bind: [bankTable],
 	});
 };
 
 export const deleteBank = (context: StackContext) => {
+	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, 'DeleteBank', {
-		handler: 'functions/banks/application/handler/delete.handler',
+	return createDefaultFunction(context, 'DeleteBank', {
+		handler: 'services/functions/banks/application/handler/delete.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
 		},
-		permissions: [bankTable],
+		permissions: withDynamoDBKeyPolicy([]),
+		bind: [bankTable],
 	});
 };

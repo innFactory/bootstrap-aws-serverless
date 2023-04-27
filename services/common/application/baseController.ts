@@ -32,23 +32,23 @@ export abstract class BaseController {
 				switch (result.left.statusCode) {
 					case 400:
 						throw new BadRequest({
-							message: '',
+							message: result.left.body.message,
 						});
 					case 401:
 						throw new Unauthorized({
-							message: '',
+							message: result.left.body.message,
 						});
 					case 403:
 						throw new Forbidden({
-							message: '',
+							message: result.left.body.message,
 						});
 					case 404:
 						throw new NotFound({
-							message: '',
+							message: result.left.body.message,
 						});
 					case 500:
 						throw new InternalServerError({
-							message: '',
+							message: result.left.body.message,
 						});
 					default:
 						logger.warn(
@@ -57,7 +57,7 @@ export abstract class BaseController {
 							)} is unhandled -> remap to internal server error`
 						);
 						throw new InternalServerError({
-							message: '',
+							message: result.left.body.message,
 						});
 				}
 			} else {
@@ -86,7 +86,7 @@ export abstract class BaseController {
 					`error awaiting result ${prettyPrint(unhandledError)}`
 				);
 				throw new InternalServerError({
-					message: '',
+					message: 'Error awaiting result',
 				});
 			}
 		};
