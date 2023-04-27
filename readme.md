@@ -100,3 +100,8 @@ Run the tests
 ```bash
 npm run test
 ```
+
+## Contributors
+
+<a href="https://github.com/anderha"><img src="https://avatars.githubusercontent.com/u/36031262?v=4" title="anderha" width="80" height="80"></a>
+<a href="https://github.com/MoeQuadrat"><img src="https://avatars.githubusercontent.com/u/53238135?v=4" title="MoeQuadrat" width="80" height="80"></a>
