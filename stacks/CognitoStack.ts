@@ -31,7 +31,7 @@ const createDefaultCognitoSettings = (
 					implicitCodeGrant: true,
 				},
 				scopes: [OAuthScope.EMAIL],
-				callbackUrls: ['http://test.local:3000'], // TODO
+				callbackUrls: ['http://localhost:3000'], // TODO
 			},
 			supportedIdentityProviders: [
 				UserPoolClientIdentityProvider.COGNITO,

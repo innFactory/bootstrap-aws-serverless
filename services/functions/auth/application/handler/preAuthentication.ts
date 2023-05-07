@@ -1,4 +1,5 @@
 import { buildLogger } from '@common/logging/loggerFactory';
+import { MetricExporter } from '@common/metrics/metricExporter';
 import { buildTracer } from '@common/tracing/tracerFactory';
 import { envEnum } from '@sst-env';
 import { PreAuthenticationTriggerHandler } from 'aws-lambda';
@@ -18,6 +19,7 @@ export const handler: PreAuthenticationTriggerHandler = async (
 		...context,
 		logger: buildLogger('preAuthentication'),
 		tracer: buildTracer('preAuthentication'),
+		metricExporter: new MetricExporter(),
 		stage: stage,
 	});
 

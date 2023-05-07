@@ -1,4 +1,5 @@
 import { buildLogger } from '@common/logging/loggerFactory';
+import { MetricExporter } from '@common/metrics/metricExporter';
 import { buildTracer } from '@common/tracing/tracerFactory';
 import { envEnum } from '@sst-env';
 import { PostAuthenticationTriggerHandler } from 'aws-lambda';
@@ -18,6 +19,7 @@ export const handler: PostAuthenticationTriggerHandler = async (
 		...context,
 		logger: buildLogger('postAuthentication'),
 		tracer: buildTracer('postAuthentication'),
+		metricExporter: new MetricExporter(),
 		stage: stage,
 	});
 

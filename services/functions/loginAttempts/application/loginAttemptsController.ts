@@ -1,5 +1,4 @@
 import { BaseController } from '@common/application/baseController';
-import { prettyPrint } from '@common/logging/prettyPrint';
 import { INJECTABLES } from '@common/injection/injectables';
 import { lazyInject } from '@common/injection/decorator';
 import { pipe } from 'fp-ts/lib/function';
@@ -18,29 +17,20 @@ class LoginAttemptsController extends BaseController {
 	public preAuthentication = async (
 		event: PreAuthenticationTriggerEvent,
 		context: InvocationContext
-	) => {
-		const { logger } = context;
-		logger.addContext(context);
-		logger.logEventIfEnabled(prettyPrint(event));
-
-		return pipe(
+	) =>
+		pipe(
 			this.authService.preAuthentication(event.userName, context),
 			mapResultToApiProxyResult
 		)();
-	};
 
 	public postAuthentication = async (
 		event: PostAuthenticationTriggerEvent,
 		context: InvocationContext
-	) => {
-		const { logger } = context;
-		logger.addContext(context);
-		logger.logEventIfEnabled(prettyPrint(event));
-		return pipe(
+	) =>
+		pipe(
 			this.authService.postAuthentication(event.userName, context),
 			mapResultToApiProxyResult
 		)();
-	};
 }
 
 export const authController = new LoginAttemptsController();
