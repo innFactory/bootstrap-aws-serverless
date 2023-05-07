@@ -17,6 +17,8 @@ import { LoginAttemptsService } from '@functions/loginAttempts/domain/interfaces
 import { LoginAttemptsServiceImpl } from '@functions/loginAttempts/domain/services/authServiceImpl';
 import { LoginAttemptsRepositoryImpl } from '@functions/loginAttempts/infrastructure/loginAttemptsRepositoryImpl';
 import { LoginAttemptsRepository } from '@functions/loginAttempts/domain/interfaces/loginAttemptsRepository';
+import { UserManagementRepository } from '@functions/users/domain/interfaces/userManagementRepository';
+import { CognitoRepository } from '@functions/users/infrastructure/cognitoRepository';
 
 export const bindInterfaces = () => {
 	bindStageIndependent();
@@ -46,14 +48,17 @@ const bindStageIndependent = () => {
 
 const bindForDeployedStage = () => {
 	bindDynamoDBRepositryImpl();
+	bindUserManagementRepository();
 };
 
 const bindForTestStage = () => {
 	bindDynamoDBRepositoryTestMock();
+	bindUserManagementRepositoryMock();
 };
 
 const bindForLocalStage = () => {
 	bindDynamoDBRepositryImpl();
+	bindUserManagementRepository();
 };
 
 // dynamodb
@@ -69,3 +74,13 @@ const bindDynamoDBRepositoryTestMock = () =>
 			INJECTABLES.DynamoDBRepository
 		)
 		.to(DynamoDBRepositoryTestMock);
+
+// user management / cognito
+const bindUserManagementRepository = () =>
+	injector
+		.bind<UserManagementRepository>(INJECTABLES.UserManagementRepository)
+		.to(CognitoRepository);
+const bindUserManagementRepositoryMock = () =>
+	injector
+		.bind<UserManagementRepository>(INJECTABLES.UserManagementRepository)
+		.to(CognitoRepository);

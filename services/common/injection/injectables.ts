@@ -6,6 +6,8 @@ const INJECTABLES = {
 
 	LoginAttemptsService: Symbol.for('LoginAttemptsService'),
 	LoginAttemptsRepository: Symbol.for('LoginAttemptsRepository'),
+
+	UserManagementRepository: Symbol.for('UserManagementRepository'),
 };
 
 export { INJECTABLES };

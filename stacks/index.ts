@@ -5,6 +5,7 @@ import { RemovalPolicy } from 'aws-cdk-lib';
 import { isDev, isProd, isStaging } from './common/isOfStage';
 import { KeysStack } from 'stacks/KeysStack';
 import { AlarmStack } from './AlarmStack';
+import { CognitoStack } from './CognitoStack';
 
 export default function (app: App) {
 	if (!isProd(app.stage)) {
@@ -23,7 +24,10 @@ export default function (app: App) {
 		app.stack(AlarmStack);
 	}
 
-	app.stack(KeysStack).stack(DynamoDbStack).stack(ApiStack);
+	app.stack(KeysStack)
+		.stack(DynamoDbStack)
+		.stack(CognitoStack)
+		.stack(ApiStack);
 }
 
 const getEnvVars = (stage: string) => {
