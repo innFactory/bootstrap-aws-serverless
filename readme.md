@@ -63,6 +63,32 @@ Smithy API models are defined in `./smithy-codegen/model/`. Generated code can b
 
 AWS Ressources are defined in `./stacks/` using SST and/or CDK. Entrypoint of the SST Application is `./sst.config.ts`
 
+##### ApiStack
+
+-   Definition of the api gateway(s) with its routes and lambda handlers
+-   As an example you can find a api gateway v1, which is used for REST endpoints
+-   Api gateway v2 is a HTTP and web socket api gateway
+
+##### DynamoDbStack
+
+-   Here are the encrypted table definitions of dynamoDb
+
+##### KeysStack
+
+-   Manages the available KMS Keys
+
+##### CognitoStack
+
+-   Allows to create multiple cognito instances
+
+##### AlarmStack
+
+-   Creates cloudwatch alarms and registers them to a sns topic
+-   The lambda handler of the sns topic sends the alarm to registered webhooks
+    -   The webhooks are read from a aws secret which has to be of the format of `services/functions/alarms/domain/models/alarmRecipients.ts`
+    -   Currently there is only an implementation for teams webhooks
+-   It is also possible to register a sns topic to the aws chatbot. The aws chatbot can format alarms and send them to registered webhooks
+
 #### Lambda Handlers
 
 Source code for the lambda handlers can be found in `./services/functions/` and `./services/common/`. Entrypoints of handlers are always located in `./services/functions/<domain_object>/application/handler/` where `<domain_object>` stands for the name of a domain object.
@@ -83,7 +109,7 @@ Abstraction Logic to external services, like third party APIs, databases, auth p
 
 ### Logging, Tracing and Metrics
 
-Logging and Tracing is done with [AWS Powertools](https://awslabs.github.io/aws-lambda-powertools-typescript/latest/)
+Logging, Tracing and Metrics are done with [AWS Powertools](https://awslabs.github.io/aws-lambda-powertools-typescript/latest/)
 
 ### Testing
 

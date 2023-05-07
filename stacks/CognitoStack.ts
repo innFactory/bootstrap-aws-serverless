@@ -69,7 +69,10 @@ const createDefaultCognitoSettings = (
 });
 
 export const CognitoStack = (context: StackContext) => {
-	const stacks = createStacks([], context);
+	/**
+	 * Add the cognito instances which should be created here
+	 */
+	const stacks = createStacks([{ stackId: 'example' }], context);
 
 	const userPoolIdEnvs = Object.entries(stacks).map(([stackId, value]) => {
 		return {

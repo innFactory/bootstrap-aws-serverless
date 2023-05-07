@@ -5,7 +5,7 @@ export const createAlarmPublisherFunction = (
 	context: StackContext
 ): FunctionDefinition => ({
 	...defaultFunctionProps(context),
-	timeout: '15 minutes',
+	timeout: '5 minutes',
 	handler: 'services/functions/alarms/publisher.handler',
 	permissions: ['secretsmanager'],
 });
