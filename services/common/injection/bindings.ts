@@ -13,6 +13,10 @@ import {
 import { DynamoDBRepositoryImpl } from '@common/dynamodb/infrastructure/dynamoDBRepositoryImpl';
 import { DynamoDBRepositoryTestMock } from '@common/dynamodb/infrastructure/dynamoDbRepositoryTestMock';
 import { isDeployedStage, isTestStage } from 'stacks/common/isOfStage';
+import { LoginAttemptsService } from 'services/loginAttempts/domain/interfaces/authService';
+import { LoginAttemptsServiceImpl } from 'services/loginAttempts/domain/services/authServiceImpl';
+import { LoginAttemptsRepositoryImpl } from 'services/loginAttempts/infrastructure/loginAttemptsRepositoryImpl';
+import { LoginAttemptsRepository } from 'services/loginAttempts/domain/interfaces/loginAttemptsRepository';
 
 export const bindInterfaces = () => {
 	bindStageIndependent();
@@ -31,6 +35,13 @@ const bindStageIndependent = () => {
 	injector
 		.bind<BankRepository>(INJECTABLES.BankRepository)
 		.to(BankRepositoryImpl);
+
+	injector
+		.bind<LoginAttemptsService>(INJECTABLES.LoginAttemptsService)
+		.to(LoginAttemptsServiceImpl);
+	injector
+		.bind<LoginAttemptsRepository>(INJECTABLES.LoginAttemptsRepository)
+		.to(LoginAttemptsRepositoryImpl);
 };
 
 const bindForDeployedStage = () => {
