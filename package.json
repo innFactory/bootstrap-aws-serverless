@@ -21,7 +21,8 @@
     "codegen:clean:clients": "rm -rf services/test/utils/client/* ",
     "codegen:install": "npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen",
     "codegen": "npm run codegen:clean && npm run codegen:build && npm run codegen:install && npm run codegen:client:application",
-    "codegen:client:application": "openapi-generator-cli generate -i smithy-codegen/build/smithyprojections/smithy-codegen/source/openapi/Api.openapi.json -o services/test/utils/client -g typescript-axios --additional-properties npmName=api-client,supportsES6=false,useRxJs=false,withInterfaces=true"
+    "codegen:client:application": "openapi-generator-cli generate -i smithy-codegen/build/smithyprojections/smithy-codegen/source/openapi/Api.openapi.json -o services/test/utils/client -g typescript-axios --additional-properties npmName=api-client,supportsES6=false,useRxJs=false,withInterfaces=true",
+    "login": "aws sso login --profile=innfactory-demo"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "1.6.0",

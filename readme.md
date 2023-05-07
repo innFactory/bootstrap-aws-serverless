@@ -30,7 +30,18 @@ npm run codegen
 
 ### Configure your aws account
 
+#### Local config/credentials file
+
 add the profile `innfactory-demo` into your aws config/credentials file in `~/.aws/`
+
+#### Single sign on
+
+1. Use `aws configure sso` to start the profile setup
+2. As start URL set the URL shown in IAM Identity Provider (the url to the AWS access portal) and SSO Region to `eu-central-1`
+3. (If already configured skip to step 4) You will be promted to verify your identity in your browser, select the profile that is authorized the aws account.
+    > **_NOTE:_** If your microsoft isn't set to remember your login it might falsely select an unauthorized account.
+4. Select the aws account and role that you want to setup, make sure to name the profile `innfactory-demo`
+5. run `npm run login`
 
 ### Start local SST development
 
