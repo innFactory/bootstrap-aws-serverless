@@ -18,6 +18,7 @@ export const handler: PostAuthenticationTriggerHandler = async (
 		...context,
 		logger: buildLogger('postAuthentication'),
 		tracer: buildTracer('postAuthentication'),
+		stage: stage,
 	});
 
 	if (result != 200) {

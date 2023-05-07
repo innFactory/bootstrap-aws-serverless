@@ -5,4 +5,5 @@ import { Context } from 'aws-lambda';
 export interface InvocationContext extends Context {
 	logger: Logger;
 	tracer: Tracer;
+	stage: string;
 }

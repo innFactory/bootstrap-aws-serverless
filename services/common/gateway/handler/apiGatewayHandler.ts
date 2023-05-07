@@ -13,6 +13,7 @@ import { InvocationContext } from '../model/invocationContext';
 import { InvocationContextWithUser } from '../model/invocationContextWithUser';
 import { buildLogger } from '../../logging/loggerFactory';
 import { buildTracer } from '../../tracing/tracerFactory';
+import { envEnum } from '@sst-env';
 
 const logger = buildLogger('aws-bootstrap');
 export const tracer = buildTracer('aws-bootstrap');
@@ -26,6 +27,11 @@ export function getApiGatewayHandler(
 	): Promise<APIGatewayProxyResult> => {
 		const invocationLogger = buildLogger(context.functionName, logger);
 		invocationLogger.addContext(context);
+		const stage = process.env[envEnum.SST_STAGE];
+
+		if (!stage) {
+			throw new Error('No stage');
+		}
 
 		const httpRequest = convertEvent(event);
 		const httpResponse = await handler.handle(httpRequest, {
@@ -36,6 +42,7 @@ export function getApiGatewayHandler(
 			},
 			logger: invocationLogger,
 			tracer: tracer,
+			stage: stage,
 		});
 		return convertVersion1Response({
 			...httpResponse,

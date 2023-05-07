@@ -18,6 +18,7 @@ export const handler: PreAuthenticationTriggerHandler = async (
 		...context,
 		logger: buildLogger('preAuthentication'),
 		tracer: buildTracer('preAuthentication'),
+		stage: stage,
 	});
 
 	if (result != 200) {
