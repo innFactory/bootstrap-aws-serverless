@@ -27,6 +27,7 @@
     "@aws-lambda-powertools/logger": "1.6.0",
     "@aws-lambda-powertools/tracer": "1.6.0",
     "@aws-sdk/client-cloudwatch": "^3.298.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.216.0",
     "@aws-sdk/util-base64-node": "^3.209.0",
     "@aws-sdk/util-utf8-node": "^3.259.0",
     "aws-sdk": "^2.1326.0",

@@ -13,12 +13,12 @@ import {
 
 const createDefaultCognitoSettings = (
 	context: StackContext,
-	stackId: string
+	instanceId: string
 ): CognitoProps => ({
 	login: ['email'],
 	triggers: {
-		preAuthentication: preAuthentication(context, stackId),
-		postAuthentication: postAuthentication(context, stackId),
+		preAuthentication: preAuthentication(context, instanceId),
+		postAuthentication: postAuthentication(context, instanceId),
 	},
 	cdk: {
 		userPoolClient: {
@@ -72,38 +72,53 @@ export const CognitoStack = (context: StackContext) => {
 	/**
 	 * Add the cognito instances which should be created here
 	 */
-	const stacks = createStacks([{ stackId: 'example' }], context);
+	const cognitoInstancess = createInstances(
+		[{ instanceId: 'example' }],
+		context
+	);
 
-	const userPoolIdEnvs = Object.entries(stacks).map(([stackId, value]) => {
-		return {
-			[stackId + 'USER_POOL_ID']: value.userPoolId,
-			[stackId + 'USER_POOL_CLIENT_ID']: value.userPoolClientId,
-		};
-	});
+	const userPoolIdEnvs = Object.entries(cognitoInstancess).map(
+		([instanceId, value]) => {
+			return {
+				[instanceId + '-USER_POOL_ID']: value.userPoolId,
+				[instanceId + '-USER_POOL_CLIENT_ID']: value.userPoolClientId,
+			};
+		}
+	);
 
-	const resourceARNs = Object.entries(stacks).map(([, value]) => {
+	const resourceARNs = Object.entries(cognitoInstancess).map(([, value]) => {
 		return value.userPoolArn;
 	});
 
-	const cognitoUserPools = Object.entries(stacks).map(([, value]) => {
-		return value.cdk.userPool;
-	});
+	const cognitoUserPools = Object.entries(cognitoInstancess).map(
+		([, value]) => {
+			return value.cdk.userPool;
+		}
+	);
 
-	return { stacks, userPoolIdEnvs, resourceARNs, cognitoUserPools };
+	return {
+		cognitoInstancess,
+		userPoolIdEnvs,
+		resourceARNs,
+		cognitoUserPools,
+	};
 };
 
-const createStacks = (props: { stackId: string }[], context: StackContext) => {
+const createInstances = (
+	props: { instanceId: string }[],
+	context: StackContext
+) => {
 	return props.reduce<{
-		[stackId: string]: Cognito;
-	}>((stacks, { stackId }) => {
+		[instanceId: string]: Cognito;
+	}>((stacks, { instanceId }) => {
 		const next = { ...stacks };
 
 		const cognito = new Cognito(
 			context.stack,
-			stackId,
-			createDefaultCognitoSettings(context, stackId)
+			instanceId,
+			createDefaultCognitoSettings(context, instanceId)
 		);
-		next[stackId] = cognito;
+		next[instanceId] = cognito;
 		return next;
 	}, {});
 };

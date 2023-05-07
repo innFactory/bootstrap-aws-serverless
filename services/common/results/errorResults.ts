@@ -24,6 +24,9 @@ const forbidden = (msg: string): ErrorResult =>
 const locked = (msg: string): ErrorResult =>
 	createErrorResult(StatusCodes.LOCKED, msg);
 
+const conflict = (msg: string): ErrorResult =>
+	createErrorResult(StatusCodes.CONFLICT, msg);
+
 const createErrorResult = (
 	statusCode: StatusCodes,
 	message: string
@@ -39,6 +42,7 @@ export enum StatusCodes {
 	UNAUTHORIZED = 401,
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,
+	CONFLICT = 409,
 	LOCKED = 423,
 	PRECONDITION_REQUIRED = 428,
 	INTERNAL_SERVER_ERROR = 500,
@@ -54,4 +58,5 @@ export const errorResults = {
 	internalServerError,
 	badGateway,
 	locked,
+	conflict,
 };

@@ -79,7 +79,8 @@ AWS Ressources are defined in `./stacks/` using SST and/or CDK. Entrypoint of th
 
 ##### CognitoStack
 
--   Allows to create multiple cognito instances
+-   Allows to create multiple cognito instances, differentiated by a predefined id
+-   Example interactions with Cognito are found in `services/functions/users/infrastructure/cognitoRepository.ts`
 -   Registers pre and post authentication lambda handlers to manage failed login attempts
     -   pre: increments counter and blocks requests if above threshold
     -   post: resets counter after successful login

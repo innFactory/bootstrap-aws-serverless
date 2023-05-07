@@ -11,11 +11,14 @@ export const getEuropaceToken = (context: StackContext) => {
 	});
 };
 
-export const preAuthentication = (context: StackContext, stackId: string) => {
+export const preAuthentication = (
+	context: StackContext,
+	instanceId: string
+) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { loginAttemptsTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, `${stackId}-preAuthentication`, {
+	return new Function(context.stack, `${instanceId}-preAuthentication`, {
 		...defaultFunctionProps(context),
 		handler:
 			'services/functions/auth/application/handler/preAuthentication.handler',
@@ -27,11 +30,14 @@ export const preAuthentication = (context: StackContext, stackId: string) => {
 	});
 };
 
-export const postAuthentication = (context: StackContext, stackId: string) => {
+export const postAuthentication = (
+	context: StackContext,
+	instanceId: string
+) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { loginAttemptsTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, `${stackId}-postAuthentication`, {
+	return new Function(context.stack, `${instanceId}-postAuthentication`, {
 		...defaultFunctionProps(context),
 		handler:
 			'services/functions/auth/application/handler/postAuthentication.handler',
