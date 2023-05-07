@@ -1,6 +1,6 @@
 import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { TaskResult } from '@common/results/taskResult';
-import { LoginAttemptDDB } from 'services/loginAttempts/infrastructure/model/loginAttempts';
+import { LoginAttemptDDB } from '@functions/loginAttempts/infrastructure/model/loginAttempts';
 
 export interface LoginAttemptsRepository {
 	get(

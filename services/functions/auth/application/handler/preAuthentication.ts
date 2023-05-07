@@ -2,7 +2,7 @@ import { buildLogger } from '@common/logging/loggerFactory';
 import { buildTracer } from '@common/tracing/tracerFactory';
 import { envEnum } from '@sst-env';
 import { PreAuthenticationTriggerHandler } from 'aws-lambda';
-import { authController } from '../loginAttemptsController';
+import { authController } from '../../../loginAttempts/application/loginAttemptsController';
 
 export const handler: PreAuthenticationTriggerHandler = async (
 	event,

@@ -80,6 +80,10 @@ AWS Ressources are defined in `./stacks/` using SST and/or CDK. Entrypoint of th
 ##### CognitoStack
 
 -   Allows to create multiple cognito instances
+-   Registers pre and post authentication lambda handlers to manage failed login attempts
+    -   pre: increments counter and blocks requests if above threshold
+    -   post: resets counter after successful login
+    -   remove them or reset counter e.g. after change of password
 
 ##### AlarmStack
 
