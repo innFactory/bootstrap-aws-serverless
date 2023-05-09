@@ -2,14 +2,13 @@ import {
 	ApiGatewayV1ApiAuthorizer,
 	ApiGatewayV1ApiRouteProps,
 	StackContext,
-	Function,
 	use,
 } from 'sst/constructs';
 import { CognitoUserPoolsAuthorizer } from 'aws-cdk-lib/aws-apigateway';
 import { isTestStage } from 'stacks/common/isOfStage';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { CognitoStack } from 'stacks/CognitoStack';
-import { defaultFunctionProps } from 'stacks/common/defaultFunction';
+import { createDefaultFunction } from 'stacks/common/defaultFunction';
 
 export const cognitoAuthorizer = (
 	context: StackContext
@@ -61,8 +60,7 @@ export const cognitoLambdaAuthorizer = (
 const cognitoAuthorizationFunction = (context: StackContext) => {
 	const { userPoolIdEnvs } = use(CognitoStack);
 
-	return new Function(context.stack, 'CognitoAuthorizerLambda', {
-		...defaultFunctionProps(context),
+	return createDefaultFunction(context, 'cognito-authorizer', {
 		environment: { ...userPoolIdEnvs },
 		handler:
 			'services/functions/auth/application/handler/cognitoLambdaAuthorizer.handler',

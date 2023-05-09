@@ -1,15 +1,14 @@
-import { StackContext, use, Function } from 'sst/constructs';
+import { StackContext, use } from 'sst/constructs';
 import { DynamoDbStack } from 'stacks/DynamoDbStack';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { KeysStack } from 'stacks/KeysStack';
 import { CognitoStack } from 'stacks/CognitoStack';
-import { defaultFunctionProps } from 'stacks/common/defaultFunction';
+import { createDefaultFunction } from 'stacks/common/defaultFunction';
 
 export const createUser = (context: StackContext) => {
 	const { resourceARNs, userPoolIdEnvs } = use(CognitoStack);
 
-	return new Function(context.stack, 'CreateUser', {
-		...defaultFunctionProps(context),
+	return createDefaultFunction(context, 'create-user', {
 		handler: 'services/functions/users/application/handler/create.handler',
 		environment: {
 			...userPoolIdEnvs,
@@ -35,8 +34,7 @@ export const createUser = (context: StackContext) => {
 export const getUser = (context: StackContext) => {
 	const { userPoolIdEnvs, resourceARNs } = use(CognitoStack);
 
-	return new Function(context.stack, 'GetUser', {
-		...defaultFunctionProps(context),
+	return createDefaultFunction(context, 'get-user', {
 		handler: 'services/functions/users/application/handler/get.handler',
 		environment: {
 			...userPoolIdEnvs,
@@ -54,8 +52,7 @@ export const getUser = (context: StackContext) => {
 export const getUserByMail = (context: StackContext) => {
 	const { userPoolIdEnvs, resourceARNs } = use(CognitoStack);
 
-	return new Function(context.stack, 'GetUserByMail', {
-		...defaultFunctionProps(context),
+	return createDefaultFunction(context, 'get-user-by-mail', {
 		handler:
 			'services/functions/users/application/handler/getByMail.handler',
 		environment: {
@@ -76,8 +73,7 @@ export const updatePassword = (context: StackContext) => {
 	const { loginAttemptsTable } = use(DynamoDbStack);
 	const { userPoolIdEnvs, resourceARNs } = use(CognitoStack);
 
-	return new Function(context.stack, 'UpdatePassword', {
-		...defaultFunctionProps(context),
+	return createDefaultFunction(context, 'update-password', {
 		handler:
 			'services/functions/users/application/handler/updatePassword.handler',
 		environment: {
@@ -106,8 +102,7 @@ export const deleteUser = (context: StackContext) => {
 	const { loginAttemptsTable } = use(DynamoDbStack);
 	const { userPoolIdEnvs, resourceARNs } = use(CognitoStack);
 
-	const lambda = new Function(context.stack, `deleteUser`, {
-		...defaultFunctionProps(context),
+	const lambda = createDefaultFunction(context, `delete-user`, {
 		handler: 'services/functions/users/application/handler/delete.handler',
 		environment: {
 			LOGINATTEMPTS_TABLE: loginAttemptsTable.tableName,

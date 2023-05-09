@@ -72,7 +72,7 @@ export function ApiStack(context: StackContext) {
 			},
 
 			'ANY /{proxy+}': {
-				function: 'functions/default.handler',
+				function: 'services/functions/default.handler',
 				authorizer: 'none',
 			},
 			...defaultCognitoAuthorizerRouteOnTestStage(context.stack.stage),

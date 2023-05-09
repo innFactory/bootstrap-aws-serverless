@@ -1,15 +1,10 @@
-import { StackContext, Function, use } from 'sst/constructs';
-import { defaultFunctionProps } from 'stacks/common/defaultFunction';
+import { StackContext, use } from 'sst/constructs';
+import {
+	createDefaultFunction,
+	defaultFunctionProps,
+} from 'stacks/common/defaultFunction';
 import { DynamoDbStack } from 'stacks/DynamoDbStack';
 import { KeysStack } from 'stacks/KeysStack';
-
-export const getEuropaceToken = (context: StackContext) => {
-	return new Function(context.stack, 'GetEuropaceToken', {
-		...defaultFunctionProps(context),
-		handler: 'services/functions/auth/application/handler/token.handler',
-		permissions: ['secretsmanager'],
-	});
-};
 
 export const preAuthentication = (
 	context: StackContext,
@@ -18,8 +13,7 @@ export const preAuthentication = (
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { loginAttemptsTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, `${instanceId}-preAuthentication`, {
-		...defaultFunctionProps(context),
+	return createDefaultFunction(context, `${instanceId}-pre-authentication`, {
 		handler:
 			'services/functions/auth/application/handler/preAuthentication.handler',
 		environment: {
@@ -37,7 +31,7 @@ export const postAuthentication = (
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { loginAttemptsTable } = use(DynamoDbStack);
 
-	return new Function(context.stack, `${instanceId}-postAuthentication`, {
+	return createDefaultFunction(context, `${instanceId}-post-authentication`, {
 		...defaultFunctionProps(context),
 		handler:
 			'services/functions/auth/application/handler/postAuthentication.handler',

@@ -7,6 +7,7 @@ export const createDefaultFunction = (
 	props: FunctionProps
 ) =>
 	new Function(context.stack, id, {
+		functionName: `${context.stack.stage}-${id}`,
 		...defaultFunctionProps(context),
 		...props,
 	});
