@@ -7,7 +7,7 @@ export const createDefaultFunction = (
 	props: FunctionProps
 ) =>
 	new Function(context.stack, id, {
-		functionName: `${context.stack.stage}-${id}`,
+		functionName: defaultFunctionName(context, id),
 		...defaultFunctionProps(context),
 		...props,
 	});
@@ -18,3 +18,6 @@ export const defaultFunctionProps = (context: StackContext): FunctionProps => ({
 		? undefined
 		: 'two_weeks',
 });
+
+export const defaultFunctionName = (context: StackContext, id: string) =>
+	`${context.stack.stage}-${context.app.name}-${id}`;
