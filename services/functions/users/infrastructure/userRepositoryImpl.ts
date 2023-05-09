@@ -1,6 +1,6 @@
 import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { TaskResult } from '@common/results/taskResult';
-import { UserManagementRepository } from '../domain/interfaces/userManagementRepository';
+import { UserRepository } from '../domain/interfaces/userRepository';
 import {
 	CognitoIdentityProviderClient,
 	AdminCreateUserCommand,
@@ -22,7 +22,7 @@ import { taskEither } from 'fp-ts';
 import { errorResults } from '@common/results/errorResults';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { injectable } from 'inversify';
-import { UserManagementUser } from '../domain/model/userManagementUser';
+import { User } from '../domain/model/user';
 import { extractEnv } from '@common/utils/extractEnv';
 
 type CognitoOperationDimension =
@@ -34,22 +34,22 @@ type CognitoOperationDimension =
 	| 'AdminDeleteUserCommand';
 
 @injectable()
-export class CognitoRepository implements UserManagementRepository {
+export class UserRepositoryImpl implements UserRepository {
 	private cognitoClient = new CognitoIdentityProviderClient({
 		region: 'eu-central-1',
 	});
 
 	getUserById(
 		id: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
-	): TaskResult<UserManagementUser> {
+	): TaskResult<User> {
 		return pipe(
-			this.getUserPoolId(managementId),
+			this.getUserPoolId(instanceId),
 			taskEither.chain((userPoolId) =>
 				this.getUserCommand(id, userPoolId, context)
 			),
-			taskEither.map<AdminGetUserCommandOutput, UserManagementUser>(
+			taskEither.map<AdminGetUserCommandOutput, User>(
 				this.mapOutFromCommand
 			)
 		);
@@ -58,18 +58,40 @@ export class CognitoRepository implements UserManagementRepository {
 	createUser(
 		input: {
 			email: string;
+			password: string;
 		},
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
-	): TaskResult<UserManagementUser> {
+	): TaskResult<User> {
 		const { logger } = context;
 
 		return pipe(
-			this.getUserPoolId(managementId),
-			taskEither.chain((userPoolId) =>
+			this.getUserPoolId(instanceId),
+			taskEither.bindTo('userPoolId'),
+			taskEither.bind('user', ({ userPoolId }) =>
 				this.createSignUpCommand(input, userPoolId, context)
 			),
-			taskEither.chain((user) => {
+			taskEither.bind('userId', ({ user }) =>
+				user.User?.Username
+					? taskEither.right(user.User.Username)
+					: taskEither.left(
+							errorResults.internalServerError(
+								'no id on created user'
+							)
+					  )
+			),
+			taskEither.chainFirst(({ userPoolId, userId }) =>
+				this.setPasswordCommand(
+					userId,
+					input.password,
+					userPoolId,
+					context
+				)
+			),
+			taskEither.chainFirst(({ userId, userPoolId }) =>
+				this.verifyUserEmail(userId, userPoolId, context)
+			),
+			taskEither.chain(({ user }) => {
 				if (user.User) {
 					logger.info(`user created: ${prettyPrint(user)}`);
 					return taskEither.right(user.User);
@@ -85,31 +107,13 @@ export class CognitoRepository implements UserManagementRepository {
 		);
 	}
 
-	verifyUser(
-		id: string,
-		password: string,
-		managementId: string,
-		context: InvocationContext
-	): TaskResult<void> {
-		return pipe(
-			this.getUserPoolId(managementId),
-			taskEither.chain((userPoolId) =>
-				this.setPasswordCommand(id, password, userPoolId, context)
-			),
-			taskEither.chainFirst(() =>
-				this.verifyUserEmail(id, managementId, context)
-			),
-			taskEither.map(() => void 0)
-		);
-	}
-
 	getUserByEmail(
 		email: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
-	): TaskResult<UserManagementUser | undefined> {
+	): TaskResult<User | undefined> {
 		return pipe(
-			this.getUserPoolId(managementId),
+			this.getUserPoolId(instanceId),
 			taskEither.chain((userPoolId) =>
 				this.findUserByEmailCommand(email, userPoolId, context)
 			),
@@ -133,11 +137,11 @@ export class CognitoRepository implements UserManagementRepository {
 	setPassword(
 		id: string,
 		password: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
 	): TaskResult<void> {
 		return pipe(
-			this.getUserPoolId(managementId),
+			this.getUserPoolId(instanceId),
 			taskEither.chain((userPoolId) =>
 				this.setPasswordCommand(id, password, userPoolId, context)
 			),
@@ -147,11 +151,11 @@ export class CognitoRepository implements UserManagementRepository {
 
 	delete(
 		id: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
 	): TaskResult<void> {
 		return pipe(
-			this.getUserPoolId(managementId),
+			this.getUserPoolId(instanceId),
 			taskEither.chain((userPoolId) =>
 				this.deleteUserCommand(id, userPoolId, context)
 			),
@@ -160,20 +164,21 @@ export class CognitoRepository implements UserManagementRepository {
 	}
 
 	private getUserPoolId = (cognitoInstanceId: string) =>
-		extractEnv(`${cognitoInstanceId}-USER_POOL_ID`, CognitoRepository.name);
+		extractEnv(
+			`${cognitoInstanceId}_USER_POOL_ID`,
+			UserRepositoryImpl.name
+		);
 
 	private extractEmail = (userAttributes?: AttributeType[]) =>
 		userAttributes?.find((attr) => attr.Name === 'email')?.Value ?? '';
 
-	private mapOutFromUserType = (user: UserType): UserManagementUser => ({
+	private mapOutFromUserType = (user: UserType): User => ({
 		id: user.Username ?? '',
 		email: this.extractEmail(user.Attributes),
 		status: user.UserStatus,
 	});
 
-	private mapOutFromCommand = (
-		user: AdminGetUserCommandOutput
-	): UserManagementUser => ({
+	private mapOutFromCommand = (user: AdminGetUserCommandOutput): User => ({
 		id: user.Username ?? '',
 		email: this.extractEmail(user.UserAttributes),
 		status: user.UserStatus,
@@ -292,14 +297,14 @@ export class CognitoRepository implements UserManagementRepository {
 	}
 
 	private verifyUserEmail(
-		email: string,
+		id: string,
 		userpoolId: string,
 		context: InvocationContext
 	): TaskResult<UpdateUserAttributesCommandOutput> {
 		return this.sendCommand(
 			this.cognitoClient.send(
 				new AdminUpdateUserAttributesCommand({
-					Username: email,
+					Username: id,
 					UserPoolId: userpoolId,
 					UserAttributes: [
 						{

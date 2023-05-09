@@ -17,8 +17,10 @@ import { LoginAttemptsService } from '@functions/loginAttempts/domain/interfaces
 import { LoginAttemptsServiceImpl } from '@functions/loginAttempts/domain/services/authServiceImpl';
 import { LoginAttemptsRepositoryImpl } from '@functions/loginAttempts/infrastructure/loginAttemptsRepositoryImpl';
 import { LoginAttemptsRepository } from '@functions/loginAttempts/domain/interfaces/loginAttemptsRepository';
-import { UserManagementRepository } from '@functions/users/domain/interfaces/userManagementRepository';
-import { CognitoRepository } from '@functions/users/infrastructure/cognitoRepository';
+import { UserRepository } from '@functions/users/domain/interfaces/userRepository';
+import { UserRepositoryImpl } from '@functions/users/infrastructure/userRepositoryImpl';
+import { UserService } from '@functions/users/domain/interfaces/userService';
+import { UserServiceImpl } from '@functions/users/domain/services/userServiceImpl';
 
 export const bindInterfaces = () => {
 	bindStageIndependent();
@@ -44,21 +46,23 @@ const bindStageIndependent = () => {
 	injector
 		.bind<LoginAttemptsRepository>(INJECTABLES.LoginAttemptsRepository)
 		.to(LoginAttemptsRepositoryImpl);
+
+	injector.bind<UserService>(INJECTABLES.UserService).to(UserServiceImpl);
 };
 
 const bindForDeployedStage = () => {
 	bindDynamoDBRepositryImpl();
-	bindUserManagementRepository();
+	bindUserRepository();
 };
 
 const bindForTestStage = () => {
 	bindDynamoDBRepositoryTestMock();
-	bindUserManagementRepositoryMock();
+	bindUserRepositoryMock();
 };
 
 const bindForLocalStage = () => {
 	bindDynamoDBRepositryImpl();
-	bindUserManagementRepository();
+	bindUserRepository();
 };
 
 // dynamodb
@@ -75,12 +79,12 @@ const bindDynamoDBRepositoryTestMock = () =>
 		)
 		.to(DynamoDBRepositoryTestMock);
 
-// user management / cognito
-const bindUserManagementRepository = () =>
+// user
+const bindUserRepository = () =>
 	injector
-		.bind<UserManagementRepository>(INJECTABLES.UserManagementRepository)
-		.to(CognitoRepository);
-const bindUserManagementRepositoryMock = () =>
+		.bind<UserRepository>(INJECTABLES.UserRepository)
+		.to(UserRepositoryImpl);
+const bindUserRepositoryMock = () =>
 	injector
-		.bind<UserManagementRepository>(INJECTABLES.UserManagementRepository)
-		.to(CognitoRepository);
+		.bind<UserRepository>(INJECTABLES.UserRepository)
+		.to(UserRepositoryImpl);

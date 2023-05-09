@@ -97,7 +97,7 @@ AWS Ressources are defined in `./stacks/` using SST and/or CDK. Entrypoint of th
 -   Registers pre and post authentication lambda handlers to manage failed login attempts
     -   pre: increments counter and blocks requests if above threshold
     -   post: resets counter after successful login
-    -   remove them or reset counter e.g. after change of password
+    -   remove them or reset counter e.g. after change of password -> refer to `setPassword` in `services/functions/users/domain/services/userServiceImpl.ts`
 
 ##### AlarmStack
 

@@ -36,12 +36,12 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (
 	}
 
 	const cognitoInstanceId = Object.keys(process.env)
-		.filter((k) => k.includes('-USER_POOL_ID'))
+		.filter((k) => k.includes('_USER_POOL_ID'))
 		.find((k) => {
 			const value = process.env[k];
 			return value && value.includes(userPoolId);
 		})
-		?.replace('-USER_POOL_ID', '');
+		?.replace('_USER_POOL_ID', '');
 
 	if (cognitoInstanceId === undefined) {
 		logger.warn('No cognitoInstanceId');
@@ -52,7 +52,7 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (
 	}
 
 	const userPoolClientId =
-		process.env[`${cognitoInstanceId}-USER_POOL_CLIENT_ID`];
+		process.env[`${cognitoInstanceId}_USER_POOL_CLIENT_ID`];
 
 	if (userPoolClientId === undefined) {
 		logger.warn('No userPoolClientId - invalid token');

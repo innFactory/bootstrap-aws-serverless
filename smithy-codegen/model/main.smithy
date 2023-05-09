@@ -11,7 +11,8 @@ use smithy.framework#ValidationException
 @auth([httpBearerAuth])
 service Api {
     version: "0.0.1",
-    resources: [Bank]
+    resources: [Bank, User]
+    operations: [GetUserByMailRequest]
     errors: [InternalServerError, NotFound, BadRequest, Unauthorized, Forbidden]
 }
 

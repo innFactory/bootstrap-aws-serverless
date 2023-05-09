@@ -1,45 +1,39 @@
 import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { TaskResult } from '@common/results/taskResult';
-import { UserManagementUser } from '../model/userManagementUser';
+import { User } from '../model/user';
 
 /**
- * Repository for one user management
- * user managements are differentiated by the managementId
+ * users are differentiated by the instanceId
  * e.g. for cognito it would be the instanceId defined in the CognitoStack
  */
-export interface UserManagementRepository {
+export interface UserRepository {
 	createUser(
 		input: {
 			email: string;
+			password: string;
 		},
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
-	): TaskResult<UserManagementUser>;
-	verifyUser(
-		id: string,
-		password: string,
-		managementId: string,
-		context: InvocationContext
-	): TaskResult<void>;
+	): TaskResult<User>;
 	setPassword(
 		id: string,
 		password: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
 	): TaskResult<void>;
 	getUserByEmail(
 		email: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
-	): TaskResult<UserManagementUser | undefined>;
+	): TaskResult<User | undefined>;
 	getUserById(
 		id: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
-	): TaskResult<UserManagementUser>;
+	): TaskResult<User>;
 	delete(
 		id: string,
-		managementId: string,
+		instanceId: string,
 		context: InvocationContext
 	): TaskResult<void>;
 }

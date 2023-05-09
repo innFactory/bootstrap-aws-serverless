@@ -6,15 +6,13 @@ import { taskEither } from 'fp-ts';
 import { injectable } from 'inversify';
 import { userManagementUsers } from 'services/test/mockData/userManagementUsersMock';
 import { v4 } from 'uuid';
-import { UserManagementRepository } from '../domain/interfaces/userManagementRepository';
-import { UserManagementUser } from '../domain/model/userManagementUser';
+import { UserRepository } from '../domain/interfaces/userRepository';
+import { User } from '../domain/model/user';
 
 @injectable()
-export class UserManagementRepositoryTestMock
-	implements UserManagementRepository
-{
+export class UserManagementRepositoryTestMock implements UserRepository {
 	private mockToMap = () =>
-		new Map<string, UserManagementUser[]>(
+		new Map<string, User[]>(
 			Object.keys(userManagementUsers).map((managementId) => [
 				managementId,
 				userManagementUsers[managementId],
@@ -27,12 +25,12 @@ export class UserManagementRepositoryTestMock
 	};
 
 	createUser(
-		input: { registrationId: string; dsrVersion: string; email: string },
+		input: { email: string; password: string },
 		managementId: string,
 		_context: InvocationContext
-	): TaskResult<UserManagementUser> {
+	): TaskResult<User> {
 		this.reset();
-		const user: UserManagementUser = {
+		const user: User = {
 			email: input.email,
 			id: v4(),
 		};
@@ -60,31 +58,11 @@ export class UserManagementRepositoryTestMock
 		return taskEither.right(undefined);
 	}
 
-	verifyUser(
-		id: string,
-		_password: string,
-		managementId: string,
-		_context: InvocationContext
-	): TaskResult<void> {
-		this.reset();
-		const usersOfPartner = this.db.get(managementId) ?? [];
-		const user = usersOfPartner.find((u) => u.id === id);
-		if (user) {
-			this.db.set(
-				managementId,
-				usersOfPartner.map((u) =>
-					u.id !== user.id ? u : { ...user, status: undefined }
-				)
-			);
-		}
-		return taskEither.right(undefined);
-	}
-
 	getUserByEmail(
 		email: string,
 		managementId: string,
 		_context: InvocationContext
-	): TaskResult<UserManagementUser | undefined> {
+	): TaskResult<User | undefined> {
 		this.reset();
 		const users = this.db.get(managementId) ?? [];
 		return taskEither.right(users.find((user) => user.email === email));
@@ -94,7 +72,7 @@ export class UserManagementRepositoryTestMock
 		id: string,
 		managementId: string,
 		_context: InvocationContext
-	): TaskResult<UserManagementUser> {
+	): TaskResult<User> {
 		this.reset();
 		const users = this.db.get(managementId) ?? [];
 		const user = users.find((user) => user.id === id);

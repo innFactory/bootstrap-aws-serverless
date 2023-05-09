@@ -80,8 +80,8 @@ export const CognitoStack = (context: StackContext) => {
 	const userPoolIdEnvs = Object.entries(cognitoInstancess).map(
 		([instanceId, value]) => {
 			return {
-				[instanceId + '-USER_POOL_ID']: value.userPoolId,
-				[instanceId + '-USER_POOL_CLIENT_ID']: value.userPoolClientId,
+				[instanceId + '_USER_POOL_ID']: value.userPoolId,
+				[instanceId + '_USER_POOL_CLIENT_ID']: value.userPoolClientId,
 			};
 		}
 	);
@@ -98,7 +98,7 @@ export const CognitoStack = (context: StackContext) => {
 
 	return {
 		cognitoInstancess,
-		userPoolIdEnvs,
+		userPoolIdEnvs: Object.assign({}, ...userPoolIdEnvs),
 		resourceARNs,
 		cognitoUserPools,
 	};
