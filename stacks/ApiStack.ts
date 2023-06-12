@@ -19,6 +19,10 @@ import {
 	getUserByMail,
 	updatePassword,
 } from '@resources/users/usersFunctions';
+import {
+	createDefaultFunction,
+	defaultFunctionName,
+} from './common/defaultFunction';
 
 export function ApiStack(context: StackContext) {
 	const api = new ApiGatewayV1Api(context.stack, 'api', {
@@ -72,7 +76,10 @@ export function ApiStack(context: StackContext) {
 			},
 
 			'ANY /{proxy+}': {
-				function: 'services/functions/default.handler',
+				function: createDefaultFunction(context, 'any-route', {
+					functionName: defaultFunctionName(context, 'any-route'),
+					handler: 'services/functions/default.handler',
+				}),
 				authorizer: 'none',
 			},
 			...defaultCognitoAuthorizerRouteOnTestStage(context.stack.stage),
