@@ -60,7 +60,7 @@ You can change the stack name in the `.sst` Folder in the `stage` File.
 
 This service heavily uses some libraries you might want to learn more about
 
--   [SST](https://sst.dev/) - a fullstack application framework to build apps on AWS
+-   [SST](https://sst.dev/) - a fullstack application framework to build apps on AWS, based on [CDK](https://aws.amazon.com/de/cdk/)
 -   [smithy](https://smithy.io/2.0/index.html) - a interface definition language
 -   [fp-ts](https://gcanti.github.io/fp-ts/) - typed function programming for typescript
 
@@ -144,6 +144,10 @@ Run the tests
 ```bash
 npm run test
 ```
+
+### CDK Assets
+
+CDK is ramping up assets in S3 with each deploy which won't be deleted automatically. Refer to this [issue](https://github.com/aws/aws-cdk-rfcs/issues/64) for further information about the difficulties of deleting CDK assets and to track a future built in feature. This app makes use of a 3. party tool called [Toolkit cleaner](https://github.com/jogold/cloudstructs/blob/master/src/toolkit-cleaner) to determine and delete old and unused CDK assets. It is initialized in [CdkAssetsCleanupStack](./stacks/CdkAssetsCleanupStack.ts). Deploy it once per AWS Account. Either as scheduled job or execute it manually as needed in the cloud console via the step function menu.
 
 ## Contributors
 

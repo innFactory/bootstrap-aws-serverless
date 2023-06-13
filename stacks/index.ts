@@ -24,6 +24,8 @@ export default function (app: App) {
 		app.stack(AlarmStack);
 	}
 
+	// app.stack(CdkAssetsCleanupStack); deploy it once per AWS account
+
 	app.stack(KeysStack)
 		.stack(DynamoDbStack)
 		.stack(CognitoStack)
