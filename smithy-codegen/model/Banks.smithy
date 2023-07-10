@@ -19,7 +19,7 @@ resource Bank {
 
 string BankId
 
-@http(method: "POST", uri: "/banks")
+@http(method: "POST", uri: "/v1/banks")
 operation CreateBankRequest {
     input: CreateBankInput
     output: BankOutput
@@ -39,7 +39,7 @@ structure BankOutput for Bank {
 }
 
 @readonly
-@http(method: "GET", uri: "/banks/{id}")
+@http(method: "GET", uri: "/v1/banks/{id}")
 operation GetBankRequest {
     input: GetBankInput
     output: BankOutput
@@ -52,7 +52,7 @@ structure GetBankInput for Bank {
     $id
 }
 
-@http(method: "PATCH", uri: "/banks")
+@http(method: "PATCH", uri: "/v1/banks")
 operation UpdateBankRequest {
     input: UpdateBankInput
     output: BankOutput
@@ -66,7 +66,7 @@ structure UpdateBankInput for Bank {
 }
 
 @idempotent
-@http(method: "DELETE", uri: "/banks/{id}")
+@http(method: "DELETE", uri: "/v1/banks/{id}")
 operation DeleteBankRequest {
     input: DeleteBankInput
     output: BankOutput
@@ -80,7 +80,7 @@ structure DeleteBankInput for Bank {
 }
 
 @readonly
-@http(method: "GET", uri: "/banks")
+@http(method: "GET", uri: "/v1/banks")
 operation ListBanksRequest {
     input: BanksRequest
     output: BanksResponse

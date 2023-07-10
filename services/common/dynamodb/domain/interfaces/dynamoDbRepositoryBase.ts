@@ -533,10 +533,10 @@ abstract class DynamoDBRepositoryBase {
 				async () => {
 					logger.debug(`batch writing ${prettyPrint(writeRequests)}`);
 					return await Promise.all(
-						writeRequests.map(async (writeRequest) =>
-							this.ddb.batchWriteItem(writeRequest).promise()
+						writeRequests.map((writeRequest, index) =>
+							this.batchWriteRecursive(writeRequest, index)
 						)
-					);
+					).then((value) => value.flat());
 				},
 				(error) => {
 					const msg = `error batch writing ${prettyPrint(error)}`;
@@ -546,6 +546,38 @@ abstract class DynamoDBRepositoryBase {
 					);
 				}
 			);
+
+	private batchWriteRecursive = async (
+		writeRequest: DynamoDB.BatchWriteItemInput,
+		backOffFactor: number,
+		results?: PromiseResult<DynamoDB.BatchWriteItemOutput, AWS.AWSError>[]
+	): Promise<
+		PromiseResult<DynamoDB.BatchWriteItemOutput, AWS.AWSError>[]
+	> => {
+		const result = await this.ddb.batchWriteItem(writeRequest).promise();
+		const itemsToRetry = result.UnprocessedItems;
+		if (itemsToRetry && Object.keys(itemsToRetry).length > 0) {
+			return await new Promise((resolve, reject) => {
+				setTimeout(
+					() =>
+						this.batchWriteRecursive(
+							{ RequestItems: itemsToRetry },
+							backOffFactor,
+							results ? [...results, result] : [result]
+						)
+							.then(resolve)
+							.catch(reject),
+					100 * (results?.length ?? 1) + 10 * backOffFactor
+				);
+			});
+		} else {
+			if (results) {
+				return [...results, result];
+			} else {
+				return [result];
+			}
+		}
+	};
 
 	private processBatchWriteOutput =
 		(logger: Logger) =>

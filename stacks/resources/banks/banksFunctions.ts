@@ -7,7 +7,7 @@ export const getBank = (context: StackContext) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return createDefaultFunction(context, 'GetBank', {
+	return createDefaultFunction(context, 'get-bank', {
 		handler: 'services/functions/banks/application/handler/get.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
@@ -21,7 +21,7 @@ export const getBanks = (context: StackContext) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return createDefaultFunction(context, 'GetBanks', {
+	return createDefaultFunction(context, 'get-banks', {
 		handler: 'services/functions/banks/application/handler/list.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
@@ -35,7 +35,7 @@ export const createBank = (context: StackContext) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return createDefaultFunction(context, 'CreateBank', {
+	return createDefaultFunction(context, 'create-bank', {
 		handler: 'services/functions/banks/application/handler/create.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
@@ -49,7 +49,7 @@ export const updateBank = (context: StackContext) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return createDefaultFunction(context, 'UpdateBank', {
+	return createDefaultFunction(context, 'update-bank', {
 		handler: 'services/functions/banks/application/handler/update.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
@@ -63,7 +63,7 @@ export const deleteBank = (context: StackContext) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { bankTable } = use(DynamoDbStack);
 
-	return createDefaultFunction(context, 'DeleteBank', {
+	return createDefaultFunction(context, 'delete-bank', {
 		handler: 'services/functions/banks/application/handler/delete.handler',
 		environment: {
 			BANKS_TABLE: bankTable.tableName,
