@@ -5,8 +5,112 @@ import { taskEither } from 'fp-ts';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { errorResults } from '@common/results/errorResults';
 import { S3 } from 'aws-sdk';
+import { Logger } from '@aws-lambda-powertools/logger';
+import { pipe } from 'fp-ts/lib/function';
+import { ListOptions, ListResult } from '../domain/models/list';
+import { S3Object } from '../domain/models/s3object';
+interface InternalListResult {
+	objects: S3.Object[] | undefined;
+	tokenForNext: string | undefined;
+}
+type Resolver = {
+	resolve: (value: InternalListResult) => void;
+	reject: (value: unknown) => void;
+};
 
 export class S3RepositoryImpl implements S3Repository {
+	list(
+		options: ListOptions,
+		bucketName: string,
+		context: InvocationContext
+	): TaskResult<ListResult> {
+		return pipe(
+			taskEither.tryCatch(
+				() =>
+					new Promise<InternalListResult>((resolve, reject) =>
+						this.listObjectsOfBucket(
+							options,
+							bucketName,
+							{ resolve, reject },
+							context.logger
+						)
+					),
+				(error) => {
+					context.logger.error(
+						`Error listing objects of bucket ${bucketName} ${prettyPrint(
+							error
+						)}`
+					);
+					return errorResults.internalServerError(
+						'Error listing objects of bucket'
+					);
+				}
+			),
+			taskEither.map((listResult) => ({
+				tokenForNext: listResult.tokenForNext,
+				objects:
+					listResult.objects
+						?.filter((object) => object.Key !== undefined)
+						.map((object) => ({
+							name: object.Key ?? '',
+						})) ?? [],
+			}))
+		);
+	}
+
+	download(
+		keys: string[],
+		bucketName: string,
+		context: InvocationContext
+	): TaskResult<S3Object[]> {
+		return taskEither.tryCatch(
+			async () => {
+				if (keys) {
+					const all = keys.map(
+						(key) =>
+							new Promise<S3Object>((resolve, reject) => {
+								new S3().getObject(
+									{
+										Bucket: bucketName,
+										Key: key,
+									},
+									(error, data) => {
+										if (error && error.message) {
+											reject(error.message);
+											return;
+										}
+										if (data) {
+											resolve({
+												name: key,
+												content: data.Body
+													? `${data.Body.toString()}`
+													: undefined,
+											});
+											return;
+										}
+										reject('Unknown error');
+									}
+								);
+							})
+					);
+					return Promise.all(all);
+				} else {
+					return Promise.resolve([]);
+				}
+			},
+			(error) => {
+				context.logger.error(
+					`Error downloading objects of bucket ${bucketName} ${prettyPrint(
+						error
+					)}`
+				);
+				return errorResults.internalServerError(
+					'Error downloading objects of bucket'
+				);
+			}
+		);
+	}
+
 	upload(
 		file: { name: string; content: string },
 		bucketName: string,
@@ -124,5 +228,59 @@ export class S3RepositoryImpl implements S3Repository {
 				);
 			}
 		);
+	}
+
+	private listObjectsOfBucket(
+		options: ListOptions,
+		bucketName: string,
+		resolver: Resolver,
+		logger: Logger,
+		tokenForNext?: string,
+		resultingObjects?: S3.Object[]
+	) {
+		new S3().listObjectsV2(
+			{ Bucket: bucketName, ContinuationToken: tokenForNext },
+			(error, objects) => {
+				if (error && error.message) {
+					resolver.reject(error.message);
+					return;
+				}
+				if (objects) {
+					if (objects.NextContinuationToken && options.all) {
+						this.listObjectsOfBucket(
+							options,
+							bucketName,
+							resolver,
+							logger,
+							objects.NextContinuationToken,
+							this.mergeObjects(
+								resultingObjects,
+								objects.Contents
+							)
+						);
+						return;
+					} else {
+						resolver.resolve({
+							objects: this.mergeObjects(
+								resultingObjects,
+								objects.Contents
+							),
+							tokenForNext: objects.NextContinuationToken,
+						});
+						return;
+					}
+				}
+				resolver.reject('Unknown error');
+			}
+		);
+	}
+
+	private mergeObjects(
+		resultingObjects: S3.Object[] | undefined,
+		currentObjects: S3.Object[] | undefined
+	): S3.Object[] | undefined {
+		return resultingObjects
+			? resultingObjects.concat(currentObjects ? currentObjects : [])
+			: currentObjects;
 	}
 }
