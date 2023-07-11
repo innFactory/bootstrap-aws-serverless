@@ -13,7 +13,7 @@ import { AllDataResponse } from '../domain/model/allDataResponse';
 import * as _ from 'lodash';
 
 @injectable()
-export class DynamoDBRepositoryTestMock
+export class DynamoDBRepositoryMock
 	implements DynamoDBRepository<DDBItem, unknown>
 {
 	private mockToMap = () =>

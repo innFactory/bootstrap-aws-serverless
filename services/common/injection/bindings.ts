@@ -11,7 +11,7 @@ import {
 	DynamoDBRepository,
 } from '@common/dynamodb/domain/interfaces/dynamoDbRepository';
 import { DynamoDBRepositoryImpl } from '@common/dynamodb/infrastructure/dynamoDBRepositoryImpl';
-import { DynamoDBRepositoryTestMock } from '@common/dynamodb/infrastructure/dynamoDbRepositoryTestMock';
+import { DynamoDBRepositoryMock } from '@common/dynamodb/infrastructure/dynamoDbRepositoryMock';
 import { isDeployedStage, isTestStage } from 'stacks/common/isOfStage';
 import { LoginAttemptsService } from '@functions/loginAttempts/domain/interfaces/authService';
 import { LoginAttemptsServiceImpl } from '@functions/loginAttempts/domain/services/authServiceImpl';
@@ -21,6 +21,9 @@ import { UserRepository } from '@functions/users/domain/interfaces/userRepositor
 import { UserRepositoryImpl } from '@functions/users/infrastructure/userRepositoryImpl';
 import { UserService } from '@functions/users/domain/interfaces/userService';
 import { UserServiceImpl } from '@functions/users/domain/services/userServiceImpl';
+import { S3Repository } from '@common/s3/domain/interfaces/s3Repository';
+import { S3RepositoryImpl } from '@common/s3/infrastructure/s3RepositoryImpl';
+import { S3RepositoryMock } from '@common/s3/infrastructure/s3RepositoryMock';
 
 export const bindInterfaces = () => {
 	bindStageIndependent();
@@ -52,16 +55,19 @@ const bindStageIndependent = () => {
 
 const bindForDeployedStage = () => {
 	bindDynamoDBRepositryImpl();
+	bindS3RepositryImpl();
 	bindUserRepository();
 };
 
 const bindForTestStage = () => {
-	bindDynamoDBRepositoryTestMock();
+	bindDynamoDBRepositoryMock();
+	bindS3RepositoryMock();
 	bindUserRepositoryMock();
 };
 
 const bindForLocalStage = () => {
 	bindDynamoDBRepositryImpl();
+	bindS3RepositryImpl();
 	bindUserRepository();
 };
 
@@ -72,12 +78,18 @@ const bindDynamoDBRepositryImpl = () =>
 			INJECTABLES.DynamoDBRepository
 		)
 		.to(DynamoDBRepositoryImpl);
-const bindDynamoDBRepositoryTestMock = () =>
+const bindDynamoDBRepositoryMock = () =>
 	injector
 		.bind<DynamoDBRepository<DDBKeys, unknown>>(
 			INJECTABLES.DynamoDBRepository
 		)
-		.to(DynamoDBRepositoryTestMock);
+		.to(DynamoDBRepositoryMock);
+
+// s3
+const bindS3RepositryImpl = () =>
+	injector.bind<S3Repository>(INJECTABLES.S3Repository).to(S3RepositoryImpl);
+const bindS3RepositoryMock = () =>
+	injector.bind<S3Repository>(INJECTABLES.S3Repository).to(S3RepositoryMock);
 
 // user
 const bindUserRepository = () =>
