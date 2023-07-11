@@ -8,7 +8,7 @@ import { S3 } from 'aws-sdk';
 import { Logger } from '@aws-lambda-powertools/logger';
 import { pipe } from 'fp-ts/lib/function';
 import { ListOptions, ListResult } from '../domain/models/list';
-import { S3Object } from '../domain/models/s3object';
+import { S3Object } from '../domain/models/s3Object';
 interface InternalListResult {
 	objects: S3.Object[] | undefined;
 	tokenForNext: string | undefined;

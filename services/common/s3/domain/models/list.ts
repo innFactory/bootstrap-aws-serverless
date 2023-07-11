@@ -1,4 +1,4 @@
-import { S3Object } from './s3object';
+import { S3Object } from './s3Object';
 
 export interface ListOptions {
 	all?: boolean;

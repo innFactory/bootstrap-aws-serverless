@@ -1,7 +1,7 @@
 import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { TaskResult } from '@common/results/taskResult';
 import { ListOptions, ListResult } from '../models/list';
-import { S3Object } from '../models/s3object';
+import { S3Object } from '../models/s3Object';
 
 export interface S3Repository {
 	list(
