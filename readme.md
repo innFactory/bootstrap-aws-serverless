@@ -107,6 +107,10 @@ AWS Ressources are defined in `./stacks/` using SST and/or CDK. Entrypoint of th
     -   Currently there is only an implementation for teams webhooks
 -   It is also possible to register a sns topic to the aws chatbot. The aws chatbot can format alarms and send them to registered webhooks
 
+##### QueuesStack
+
+-   Creates SQS Queues
+
 #### Lambda Handlers
 
 Source code for the lambda handlers can be found in `./services/functions/` and `./services/common/`. Entrypoints of handlers are always located in `./services/functions/<domain_object>/application/handler/` where `<domain_object>` stands for the name of a domain object.
@@ -115,7 +119,8 @@ Source code for the lambda handlers can be found in `./services/functions/` and 
 
 ###### Application
 
-API Logic / Entrypoint
+-   API Logic / Entrypoint
+-   Handlers for SQS Messages, refer to `./services/functions/users/application/handler/deleteByQueue.ts` for an example
 
 ###### Domain
 

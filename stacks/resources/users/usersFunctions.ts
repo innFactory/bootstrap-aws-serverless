@@ -120,3 +120,27 @@ export const deleteUser = (context: StackContext) => {
 
 	return lambda;
 };
+
+export const deleteUserByQueue = (context: StackContext) => {
+	const { withDynamoDBKeyPolicy } = use(KeysStack);
+	const { loginAttemptsTable } = use(DynamoDbStack);
+	const { userPoolIdEnvs, resourceARNs } = use(CognitoStack);
+
+	return createDefaultFunction(context, 'delete-user-by-queue', {
+		handler:
+			'services/functions/users/application/handler/deleteByQueue.handler',
+		environment: {
+			LOGINATTEMPTS_TABLE: loginAttemptsTable.tableName,
+			...userPoolIdEnvs,
+		},
+		permissions: withDynamoDBKeyPolicy([
+			new iam.PolicyStatement({
+				actions: ['cognito-idp:AdminDeleteUser'],
+				effect: iam.Effect.ALLOW,
+				resources: [...resourceARNs],
+			}),
+		]),
+		bind: [loginAttemptsTable],
+		reservedConcurrentExecutions: 2, // increase for more parallelization
+	});
+};
