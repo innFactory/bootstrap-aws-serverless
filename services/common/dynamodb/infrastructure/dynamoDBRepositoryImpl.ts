@@ -201,6 +201,41 @@ export class DynamoDBRepositoryImpl
 		);
 	};
 
+	count = (
+		queryParams: {
+			tableKey: string;
+			itemKeys: DDBKeys;
+			indexName?: string;
+		},
+		context: InvocationContext
+	): TaskResult<number> => {
+		return pipe(
+			this.createKeyList(queryParams.itemKeys, context.logger, true),
+			taskEither.chain((expressionAttributeValues) => {
+				return this.countAllQuery(
+					queryParams.tableKey,
+					(tableName) => ({
+						TableName: tableName,
+						IndexName: queryParams.indexName,
+						KeyConditionExpression:
+							this.createKeyConditionExpression(
+								queryParams.itemKeys
+							),
+						ExpressionAttributeNames:
+							this.createExpressionAttributeNames(
+								queryParams.itemKeys
+							),
+						ExpressionAttributeValues: expressionAttributeValues,
+						Select: 'COUNT',
+					}),
+					undefined,
+					context.logger,
+					context.tracer
+				);
+			})
+		);
+	};
+
 	private createKeyConditionExpression = (itemKeys: DDBKeys) => {
 		return Object.keys(itemKeys)
 			.map((key) => `#${key} = :${key}`)

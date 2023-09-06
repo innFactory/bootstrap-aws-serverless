@@ -30,27 +30,7 @@ abstract class DynamoDBRepositoryBase {
 	): TaskResult<AllDataResponse<T>> =>
 		traceTaskResult(
 			pipe(
-				this.createQueryParams(tableKey, paramsCreator),
-				taskEither.bindTo('params'),
-				taskEither.bind('awsResult', ({ params }) =>
-					taskEither.tryCatch(
-						() => {
-							logger.debug(
-								`Query with params ${prettyPrint(params)}`
-							);
-							return this.ddb.query(params).promise();
-						},
-						(error) => {
-							const msg = `error querying aws with params ${prettyPrint(
-								params
-							)}: ${prettyPrint(error)}`;
-							logger.warn(msg);
-							return errorResults.internalServerError(
-								'error querying'
-							);
-						}
-					)
-				),
+				this.queryWithParams(tableKey, paramsCreator, logger),
 				taskEither.bind('items', ({ params, awsResult }) =>
 					this.processAwsResult<T>(awsResult, logger, params)
 				),
@@ -174,27 +154,7 @@ abstract class DynamoDBRepositoryBase {
 	): TaskResult<AllDataResponse<T>> => {
 		return traceTaskResult(
 			pipe(
-				this.createQueryParams(tableKey, paramsCreator),
-				taskEither.bindTo('params'),
-				taskEither.bind('awsResult', ({ params }) =>
-					taskEither.tryCatch(
-						() => {
-							logger.debug(
-								`query with params ${prettyPrint(params)}`
-							);
-							return this.ddb.query(params).promise();
-						},
-						(error) => {
-							const msg = `error scanning aws with params ${prettyPrint(
-								params
-							)}: ${prettyPrint(error)}`;
-							logger.warn(msg);
-							return errorResults.internalServerError(
-								'error scanning'
-							);
-						}
-					)
-				),
+				this.queryWithParams(tableKey, paramsCreator, logger),
 				taskEither.bind('items', ({ params, awsResult }) =>
 					this.processAwsResult<T>(awsResult, logger, params)
 				),
@@ -232,27 +192,7 @@ abstract class DynamoDBRepositoryBase {
 	): TaskResult<AllDataResponse<T>> => {
 		return traceTaskResult(
 			pipe(
-				this.createScanParams(tableKey, paramsCreator),
-				taskEither.bindTo('params'),
-				taskEither.bind('awsResult', ({ params }) =>
-					taskEither.tryCatch(
-						() => {
-							logger.debug(
-								`Scan with params ${prettyPrint(params)}`
-							);
-							return this.ddb.scan(params).promise();
-						},
-						(error) => {
-							const msg = `error scanning aws with params ${prettyPrint(
-								params
-							)}: ${prettyPrint(error)}`;
-							logger.warn(msg);
-							return errorResults.internalServerError(
-								'error scanning'
-							);
-						}
-					)
-				),
+				this.scanWithParams(tableKey, paramsCreator, logger),
 				taskEither.bind('items', ({ params, awsResult }) =>
 					this.processAwsResult<T>(awsResult, logger, params)
 				),
@@ -289,27 +229,7 @@ abstract class DynamoDBRepositoryBase {
 	): TaskResult<AllDataResponse<T>> => {
 		return traceTaskResult(
 			pipe(
-				this.createScanParams(tableKey, paramsCreator),
-				taskEither.bindTo('params'),
-				taskEither.bind('awsResult', ({ params }) =>
-					taskEither.tryCatch(
-						() => {
-							logger.debug(
-								`Scan with params ${prettyPrint(params)}`
-							);
-							return this.ddb.scan(params).promise();
-						},
-						(error) => {
-							const msg = `error scanning aws with params ${prettyPrint(
-								params
-							)}: ${prettyPrint(error)}`;
-							logger.warn(msg);
-							return errorResults.internalServerError(
-								'error scanning'
-							);
-						}
-					)
-				),
+				this.scanWithParams(tableKey, paramsCreator, logger),
 				taskEither.bind('items', (prevResults) =>
 					this.processAwsResult<T>(
 						prevResults.awsResult,
@@ -323,6 +243,109 @@ abstract class DynamoDBRepositoryBase {
 						? this.mapLastEvaluatedKey(awsResult.LastEvaluatedKey)
 						: undefined,
 				}))
+			),
+			tracer,
+			DynamoDBRepositoryBase.name
+		);
+	};
+
+	private scanWithParams(
+		tableKey: string,
+		paramsCreator: (tableName: string) => DynamoDB.ScanInput,
+		logger: Logger
+	) {
+		return pipe(
+			this.createScanParams(tableKey, paramsCreator),
+			taskEither.bindTo('params'),
+			taskEither.bind('awsResult', ({ params }) =>
+				taskEither.tryCatch(
+					() => {
+						logger.debug(`Scan with params ${prettyPrint(params)}`);
+						return this.ddb.scan(params).promise();
+					},
+					(error) => {
+						const msg = `error scanning aws with params ${prettyPrint(
+							params
+						)}: ${prettyPrint(error)}`;
+						logger.warn(msg);
+						return errorResults.internalServerError(
+							'error scanning'
+						);
+					}
+				)
+			)
+		);
+	}
+
+	private queryWithParams(
+		tableKey: string,
+		paramsCreator: (tableName: string) => DynamoDB.QueryInput,
+		logger: Logger
+	) {
+		return pipe(
+			this.createQueryParams(tableKey, paramsCreator),
+			taskEither.bindTo('params'),
+			taskEither.bind('awsResult', ({ params }) =>
+				taskEither.tryCatch(
+					() => {
+						logger.debug(
+							`query with params ${prettyPrint(params)}`
+						);
+						return this.ddb.query(params).promise();
+					},
+					(error) => {
+						const msg = `error querying aws with params ${prettyPrint(
+							params
+						)}: ${prettyPrint(error)}`;
+						logger.warn(msg);
+						return errorResults.internalServerError(
+							'error querying'
+						);
+					}
+				)
+			)
+		);
+	}
+
+	protected countAllQuery = (
+		tableKey: string,
+		paramsCreator: (tableName: string) => DynamoDB.QueryInput,
+		counted: number | undefined = 0,
+		logger: Logger,
+		tracer: Tracer
+	): TaskResult<number> => {
+		return traceTaskResult(
+			pipe(
+				this.queryWithParams(tableKey, paramsCreator, logger),
+				taskEither.bind('count', ({ params, awsResult }) => {
+					if (awsResult.$response.error) {
+						const msg = `aws error querying with params ${prettyPrint(
+							params
+						)}: ${prettyPrint(awsResult.$response.error)}`;
+						logger.error(msg);
+						return taskEither.left(
+							errorResults.internalServerError(msg)
+						);
+					} else {
+						return taskEither.right(awsResult.Count ?? 0);
+					}
+				}),
+				taskEither.chain(({ params, awsResult, count }) => {
+					const nextCounted = counted + count;
+					if (awsResult.LastEvaluatedKey) {
+						return this.countAllQuery(
+							tableKey,
+							() => ({
+								...params,
+								ExclusiveStartKey: awsResult.LastEvaluatedKey,
+							}),
+							nextCounted,
+							logger,
+							tracer
+						);
+					}
+					return taskEither.right(nextCounted);
+				})
 			),
 			tracer,
 			DynamoDBRepositoryBase.name

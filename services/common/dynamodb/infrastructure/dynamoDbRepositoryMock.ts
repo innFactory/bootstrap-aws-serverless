@@ -73,6 +73,20 @@ export class DynamoDBRepositoryMock
 		});
 	};
 
+	count = (
+		queryParams: {
+			tableKey: string;
+			itemKeys: DDBKeys;
+			indexName?: string | undefined;
+		},
+		_context: InvocationContext // eslint-disable-line @typescript-eslint/no-unused-vars
+	): TaskResult<number> => {
+		this.reset();
+		return taskEither.right(
+			this.filter(queryParams.tableKey, queryParams.itemKeys).length
+		);
+	};
+
 	upsert = (
 		queryParams: { tableKey: string; items: DDBItem[] },
 		_context: InvocationContext // eslint-disable-line @typescript-eslint/no-unused-vars
