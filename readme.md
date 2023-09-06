@@ -154,6 +154,10 @@ npm run test
 
 CDK is ramping up assets in S3 with each deploy which won't be deleted automatically. Refer to this [issue](https://github.com/aws/aws-cdk-rfcs/issues/64) for further information about the difficulties of deleting CDK assets and to track a future built in feature. This app makes use of a 3. party tool called [Toolkit cleaner](https://github.com/jogold/cloudstructs/blob/master/src/toolkit-cleaner) to determine and delete old and unused CDK assets. It is initialized in [CdkAssetsCleanupStack](./stacks/CdkAssetsCleanupStack.ts). Deploy it once per AWS Account. Either as scheduled job or execute it manually as needed in the cloud console via the step function menu.
 
+### Deployment
+
+Opt out of [anonymous telemetry collection](https://docs.sst.dev/anonymous-telemetry): `npx sst telemetry disable`
+
 ## Contributors
 
 <a href="https://github.com/anderha"><img src="https://avatars.githubusercontent.com/u/36031262?v=4" title="anderha" width="80" height="80"></a>
