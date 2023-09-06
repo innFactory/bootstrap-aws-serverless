@@ -1,27 +1,18 @@
-import { buildLogger } from '@common/logging/loggerFactory';
-import { MetricExporter } from '@common/metrics/metricExporter';
-import { buildTracer } from '@common/tracing/tracerFactory';
-import { envEnum } from '@sst-env';
 import { PreAuthenticationTriggerHandler } from 'aws-lambda';
 import { authController } from '../../../loginAttempts/application/loginAttemptsController';
+import { ApiGatewayHandler } from '@common/gateway/handler/apiGatewayHandler';
 
 export const handler: PreAuthenticationTriggerHandler = async (
 	event,
 	context
 ) => {
-	const stage = process.env[envEnum.SST_STAGE];
+	const invocationContext =
+		ApiGatewayHandler.createInvocationContextOrThrow(context);
 
-	if (!stage) {
-		throw new Error('No stage');
-	}
-
-	const result = await authController.preAuthentication(event, {
-		...context,
-		logger: buildLogger('preAuthentication'),
-		tracer: buildTracer('preAuthentication'),
-		metricExporter: new MetricExporter(),
-		stage: stage,
-	});
+	const result = await authController.preAuthentication(
+		event,
+		invocationContext
+	);
 
 	if (result != 200) {
 		throw new Error(`Failed with status ${result.toString()}`);

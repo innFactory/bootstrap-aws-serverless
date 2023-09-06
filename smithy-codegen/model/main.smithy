@@ -12,7 +12,7 @@ use smithy.framework#ValidationException
 service Api {
     version: "0.0.1",
     resources: [Bank, User]
-    operations: [GetUserByMailRequest]
+    operations: [GetUserByMailRequest, TriggerMigrations]
     errors: [InternalServerError, NotFound, BadRequest, Unauthorized, Forbidden]
 }
 

@@ -9,6 +9,9 @@ const INJECTABLES = {
 	LoginAttemptsService: Symbol.for('LoginAttemptsService'),
 	LoginAttemptsRepository: Symbol.for('LoginAttemptsRepository'),
 
+	MigrationService: Symbol.for('MigrationService'),
+	MigrationRepository: Symbol.for('MigrationRepository'),
+
 	UserService: Symbol.for('UserService'),
 	UserRepository: Symbol.for('UserRepository'),
 };

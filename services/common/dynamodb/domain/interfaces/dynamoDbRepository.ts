@@ -24,6 +24,7 @@ export interface DynamoDBRepository<ItemType extends DDBItem, ReturnType> {
 			indexName?: string;
 			limit?: number;
 			cursor?: DynamoDB.Key;
+			sortOrder?: 'asc' | 'desc';
 		},
 		context: InvocationContext
 	) => TaskResult<AllDataResponse<ReturnType>>;
