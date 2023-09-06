@@ -28,6 +28,9 @@ import { MigrationService } from '@functions/migrations/domain/interfaces/migrat
 import { MigrationServiceImpl } from '@functions/migrations/domain/services/migrationServiceImpl';
 import { MigrationRepository } from '@functions/migrations/domain/interfaces/migrationRepository';
 import { MigrationRepositoryImpl } from '@functions/migrations/infrastructure/migrationRepositoryImpl';
+import { SecretManagerRepository } from '@common/secretmanager/domain/interfaces/secretManagerRepository';
+import { SecretManagerRepositoryImpl } from '@common/secretmanager/infrastructure/secretManagerRepositoryImpl';
+import { SecretManagerRepositoryMock } from '@common/secretmanager/infrastructure/secretManagerRepositoryMock';
 
 export const bindInterfaces = () => {
 	bindStageIndependent();
@@ -66,18 +69,21 @@ const bindStageIndependent = () => {
 
 const bindForDeployedStage = () => {
 	bindDynamoDBRepositryImpl();
+	bindSecretManagerRepositoryImpl();
 	bindS3RepositryImpl();
 	bindUserRepository();
 };
 
 const bindForTestStage = () => {
 	bindDynamoDBRepositoryMock();
+	bindSecretManagerRepositoryMock();
 	bindS3RepositoryMock();
 	bindUserRepositoryMock();
 };
 
 const bindForLocalStage = () => {
 	bindDynamoDBRepositryImpl();
+	bindSecretManagerRepositoryImpl();
 	bindS3RepositryImpl();
 	bindUserRepository();
 };
@@ -95,6 +101,16 @@ const bindDynamoDBRepositoryMock = () =>
 			INJECTABLES.DynamoDBRepository
 		)
 		.to(DynamoDBRepositoryMock);
+
+// secretmanager
+const bindSecretManagerRepositoryImpl = () =>
+	injector
+		.bind<SecretManagerRepository>(INJECTABLES.SecretManagerRepository)
+		.to(SecretManagerRepositoryImpl);
+const bindSecretManagerRepositoryMock = () =>
+	injector
+		.bind<SecretManagerRepository>(INJECTABLES.SecretManagerRepository)
+		.to(SecretManagerRepositoryMock);
 
 // s3
 const bindS3RepositryImpl = () =>
