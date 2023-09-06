@@ -4,6 +4,7 @@ const INJECTABLES = {
 
 	DynamoDBRepository: Symbol.for('DynamoDBRepository'),
 
+	SecretManagerRepository: Symbol.for('SecretManagerRepository'),
 	S3Repository: Symbol.for('S3Repository'),
 
 	LoginAttemptsService: Symbol.for('LoginAttemptsService'),
