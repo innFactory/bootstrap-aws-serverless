@@ -13,7 +13,7 @@ service Api {
     version: "0.0.1",
     resources: [Bank, User]
     operations: [GetUserByMailRequest, TriggerMigrations]
-    errors: [InternalServerError, NotFound, BadRequest, Unauthorized, Forbidden]
+    errors: [ValidationException, InternalServerError, NotFound, BadRequest, Unauthorized, Forbidden]
 }
 
 
