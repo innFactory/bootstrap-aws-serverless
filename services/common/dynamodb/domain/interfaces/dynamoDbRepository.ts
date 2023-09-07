@@ -61,4 +61,13 @@ export interface DynamoDBRepository<ItemType extends DDBItem, ReturnType> {
 		},
 		context: InvocationContext
 	) => TaskResult<void>;
+
+	count: (
+		queryParams: {
+			tableKey: string;
+			itemKeys: DDBKeys;
+			indexName?: string;
+		},
+		context: InvocationContext
+	) => TaskResult<number>;
 }
