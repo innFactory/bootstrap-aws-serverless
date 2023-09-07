@@ -19,7 +19,7 @@ export class MetricExporter {
 	export(metricData: MetricData, context: InvocationContext) {
 		if (!isTestStage(context.stage)) {
 			const metric: PutMetricDataCommandInput = {
-				Namespace: `Prolo-${context.stage}`,
+				Namespace: `Bootstrap-${context.stage}`,
 				MetricData: metricData,
 			};
 			context.logger.info(`Exporting metric`, `${prettyPrint(metric)}`);

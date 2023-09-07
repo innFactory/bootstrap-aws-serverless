@@ -23,11 +23,14 @@ import {
 	createDefaultFunction,
 	defaultFunctionName,
 } from './common/defaultFunction';
+import { triggerMigrations } from '@resources/migrations/migrationsFunctions';
+import { apiKeyAuthorizer } from '@resources/auth/apiKeyAuthorizer';
 
 export function ApiStack(context: StackContext) {
 	const api = new ApiGatewayV1Api(context.stack, 'api', {
 		authorizers: {
 			cognitoLambdaAuthorizer: cognitoLambdaAuthorizer(context),
+			apiKeyAuthorizer: apiKeyAuthorizer(context),
 		},
 		defaults: {
 			authorizer: getCognitoAuthorizer(context.stack.stage),
@@ -73,6 +76,11 @@ export function ApiStack(context: StackContext) {
 			'PATCH	/v1/users/{id}/password': {
 				function: updatePassword(context),
 				authorizer: getCognitoAuthorizer(context.stack.stage),
+			},
+
+			'POST /v1/migrations': {
+				function: triggerMigrations(context),
+				authorizer: 'apiKeyAuthorizer',
 			},
 
 			'ANY /{proxy+}': {

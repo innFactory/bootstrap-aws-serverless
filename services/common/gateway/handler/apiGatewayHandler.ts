@@ -50,7 +50,7 @@ export abstract class ApiGatewayHandler<T extends InvocationContext> {
 		context: Context
 	): Either<HttpResponse, T>;
 
-	protected createInvocationContext(
+	static createInvocationContext(
 		context: Context
 	): InvocationContext | undefined {
 		const invocationLogger = this.initLogger(context);
@@ -69,7 +69,16 @@ export abstract class ApiGatewayHandler<T extends InvocationContext> {
 		};
 	}
 
-	private initLogger(context: Context) {
+	static createInvocationContextOrThrow(context: Context): InvocationContext {
+		const invocationContext = this.createInvocationContext(context);
+		if (invocationContext) {
+			return invocationContext;
+		} else {
+			throw new Error('Could not create invocation context');
+		}
+	}
+
+	private static initLogger(context: Context) {
 		const invocationLogger = buildLogger(context.functionName, logger);
 		return invocationLogger;
 	}
@@ -113,7 +122,8 @@ class ApiGatewayHandlerImpl extends ApiGatewayHandler<InvocationContext> {
 		_event: APIGatewayProxyEvent,
 		context: Context
 	): Either<HttpResponse, InvocationContext> {
-		const invocationContext = this.createInvocationContext(context);
+		const invocationContext =
+			ApiGatewayHandler.createInvocationContext(context);
 		if (invocationContext === undefined) {
 			return either.left({
 				statusCode: 500,

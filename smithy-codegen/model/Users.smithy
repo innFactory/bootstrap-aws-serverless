@@ -1,7 +1,5 @@
 $version: "2.0"
 namespace de.innfactory.bootstrapawsserverless.api
-use smithy.framework#ValidationException
-
 
 resource User {
     identifiers: {
@@ -27,7 +25,7 @@ string Password
 operation CreateUserRequest {
     input: CreateUserInput
     output: UserOutput
-    errors: [ValidationException, BadRequest]
+    errors: [BadRequest]
 }
 
 structure CreateUserInput for User {
@@ -49,7 +47,7 @@ structure UserOutput for User {
 operation GetUserRequest {
     input: GetUserInput
     output: UserOutput
-    errors: [ValidationException, NotFound]
+    errors: [NotFound]
 }
 
 structure GetUserInput for User {
@@ -63,7 +61,7 @@ structure GetUserInput for User {
 operation GetUserByMailRequest {
     input: GetUserByMailInput
     output: UserOutput
-    errors: [ValidationException, NotFound]
+    errors: [NotFound]
 }
 
 structure GetUserByMailInput {
@@ -75,7 +73,7 @@ structure GetUserByMailInput {
 @http(method: "PATCH", uri: "/v1/users/{id}/password", code: 204)
 operation UpdatePasswordRequest {
     input: UpdatePasswordInput
-    errors: [ValidationException, BadRequest, NotFound]
+    errors: [BadRequest, NotFound]
 }
 
 structure UpdatePasswordInput for User {
@@ -90,7 +88,7 @@ structure UpdatePasswordInput for User {
 @http(method: "DELETE", uri: "/v1/users/{id}", code: 204)
 operation DeleteUserRequest {
     input: DeleteUserInput
-    errors: [ValidationException, NotFound]
+    errors: [NotFound]
 }
 
 structure DeleteUserInput for User {

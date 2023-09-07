@@ -150,6 +150,13 @@ Run the tests
 npm run test
 ```
 
+### Migrations
+
+In this project migrations are one time jobs, typically executed right after a successful deployment. A migration could for example edit DynamoDB table fields or files in S3. To trigger the migrations use the api endpoint (refer to the smithy model or the ApiStack to find the endpoint) secured by a api key. Examine `./services/functions/migrations` and `./services/test/migrations` for better understanding.
+
+Use the following command in your pipe to trigger the migration after a successful deploy:
+`curl -X POST '<replace with api url>/v1/migrations' -H "Authorization: $(aws secretsmanager get-secret-value --secret-id migrations-api-key | jq -r '.SecretString | fromjson | .apiKey')"`
+
 ### CDK Assets
 
 CDK is ramping up assets in S3 with each deploy which won't be deleted automatically. Refer to this [issue](https://github.com/aws/aws-cdk-rfcs/issues/64) for further information about the difficulties of deleting CDK assets and to track a future built in feature. This app makes use of a 3. party tool called [Toolkit cleaner](https://github.com/jogold/cloudstructs/blob/master/src/toolkit-cleaner) to determine and delete old and unused CDK assets. It is initialized in [CdkAssetsCleanupStack](./stacks/CdkAssetsCleanupStack.ts). Deploy it once per AWS Account. Either as scheduled job or execute it manually as needed in the cloud console via the step function menu.

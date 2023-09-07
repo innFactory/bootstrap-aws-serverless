@@ -1,7 +1,5 @@
 $version: "2.0"
 namespace de.innfactory.bootstrapawsserverless.api
-use smithy.framework#ValidationException
-
 
 resource Bank {
     identifiers: {
@@ -23,7 +21,7 @@ string BankId
 operation CreateBankRequest {
     input: CreateBankInput
     output: BankOutput
-    errors: [ValidationException, BadRequest]
+    errors: [BadRequest]
 }
 
 structure CreateBankInput for Bank {
@@ -43,7 +41,7 @@ structure BankOutput for Bank {
 operation GetBankRequest {
     input: GetBankInput
     output: BankOutput
-    errors: [ValidationException, NotFound]
+    errors: [NotFound]
 }
 
 structure GetBankInput for Bank {
@@ -56,7 +54,7 @@ structure GetBankInput for Bank {
 operation UpdateBankRequest {
     input: UpdateBankInput
     output: BankOutput
-    errors: [ValidationException, BadRequest, NotFound]
+    errors: [BadRequest, NotFound]
 }
 
 structure UpdateBankInput for Bank {
@@ -70,7 +68,7 @@ structure UpdateBankInput for Bank {
 operation DeleteBankRequest {
     input: DeleteBankInput
     output: BankOutput
-    errors: [ValidationException, NotFound]
+    errors: [NotFound]
 }
 
 structure DeleteBankInput for Bank {
@@ -84,8 +82,6 @@ structure DeleteBankInput for Bank {
 operation ListBanksRequest {
     input: BanksRequest
     output: BanksResponse
-    errors: [ValidationException]  
-
 }
 
 structure BanksRequest with [PaginatedInput] {

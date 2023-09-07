@@ -1,8 +1,6 @@
 import { getAwsSecret } from '@common/aws/secret';
-import { buildLogger } from '@common/logging/loggerFactory';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { errorResults } from '@common/results/errorResults';
-import { envEnum } from '@sst-env';
 import { SNSEventRecord, SNSHandler } from 'aws-lambda';
 import axios, { AxiosError } from 'axios';
 import { taskEither } from 'fp-ts';
@@ -15,24 +13,29 @@ import {
 } from './domain/models/alarmRecipients';
 import { isDeployedStage, isTestStage } from 'stacks/common/isOfStage';
 import { Logger } from '@aws-lambda-powertools/logger';
+import { ApiGatewayHandler } from '@common/gateway/handler/apiGatewayHandler';
 
-export const handler: SNSHandler = async (event) => {
-	const logger = buildLogger('alarmPublisher');
-	const stage = process.env[envEnum.SST_STAGE];
-
-	if (stage === undefined) {
-		throw new Error('No stage');
-	}
+export const handler: SNSHandler = async (event, context) => {
+	const invocationContext =
+		ApiGatewayHandler.createInvocationContextOrThrow(context);
 
 	await pipe(
-		getAwsSecret<AlarmRecipients>('alarm-recipients', logger),
+		getAwsSecret<AlarmRecipients>(
+			'alarm-recipients',
+			invocationContext.logger
+		),
 		taskEither.chain((recipients) =>
 			taskEither.tryCatch(
 				async () => {
 					await Promise.all(
 						event.Records.map((record) =>
 							recipients.webhooks.map((webhook) =>
-								sendToWebhook(record, webhook, stage, logger)
+								sendToWebhook(
+									record,
+									webhook,
+									invocationContext.stage,
+									invocationContext.logger
+								)
 							)
 						)
 					);
@@ -40,7 +43,7 @@ export const handler: SNSHandler = async (event) => {
 				},
 				(error) => {
 					const axiosError = error as AxiosError;
-					logger.error(
+					invocationContext.logger.error(
 						'Error sending alarms to webhooks',
 						`${axiosError.response?.status} - ${prettyPrint(
 							axiosError.response?.data

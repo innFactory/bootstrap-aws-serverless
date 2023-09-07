@@ -24,6 +24,10 @@ import { UserServiceImpl } from '@functions/users/domain/services/userServiceImp
 import { S3Repository } from '@common/s3/domain/interfaces/s3Repository';
 import { S3RepositoryImpl } from '@common/s3/infrastructure/s3RepositoryImpl';
 import { S3RepositoryMock } from '@common/s3/infrastructure/s3RepositoryMock';
+import { MigrationService } from '@functions/migrations/domain/interfaces/migrationService';
+import { MigrationServiceImpl } from '@functions/migrations/domain/services/migrationServiceImpl';
+import { MigrationRepository } from '@functions/migrations/domain/interfaces/migrationRepository';
+import { MigrationRepositoryImpl } from '@functions/migrations/infrastructure/migrationRepositoryImpl';
 import { SecretManagerRepository } from '@common/secretmanager/domain/interfaces/secretManagerRepository';
 import { SecretManagerRepositoryImpl } from '@common/secretmanager/infrastructure/secretManagerRepositoryImpl';
 import { SecretManagerRepositoryMock } from '@common/secretmanager/infrastructure/secretManagerRepositoryMock';
@@ -52,6 +56,13 @@ const bindStageIndependent = () => {
 	injector
 		.bind<LoginAttemptsRepository>(INJECTABLES.LoginAttemptsRepository)
 		.to(LoginAttemptsRepositoryImpl);
+
+	injector
+		.bind<MigrationService>(INJECTABLES.MigrationService)
+		.to(MigrationServiceImpl);
+	injector
+		.bind<MigrationRepository>(INJECTABLES.MigrationRepository)
+		.to(MigrationRepositoryImpl);
 
 	injector.bind<UserService>(INJECTABLES.UserService).to(UserServiceImpl);
 };

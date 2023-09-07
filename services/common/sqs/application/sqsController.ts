@@ -1,9 +1,7 @@
-import { tracer } from '@common/gateway/handler/apiGatewayHandler';
+import { ApiGatewayHandler } from '@common/gateway/handler/apiGatewayHandler';
 import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { bindInterfaces } from '@common/injection/bindings';
-import { buildLogger } from '@common/logging/loggerFactory';
 import { prettyPrint } from '@common/logging/prettyPrint';
-import { MetricExporter } from '@common/metrics/metricExporter';
 import { ErrorResult } from '@common/results/errorResult';
 import { SQSBatchItemFailure, SQSHandler } from 'aws-lambda';
 import { taskEither } from 'fp-ts';
@@ -23,26 +21,10 @@ export abstract class SQSController<Message> {
 	}
 
 	public handler: SQSHandler = async (event, context) => {
-		const invocationLogger = buildLogger(this.identifier);
+		const invocationContext =
+			ApiGatewayHandler.createInvocationContextOrThrow(context);
 
 		try {
-			invocationLogger.debug(
-				`Triggered ${this.identifier}`,
-				prettyPrint(event)
-			);
-			const stage = process.env.SST_STAGE;
-			if (stage === undefined) {
-				invocationLogger.error('No stage defined');
-				return undefined;
-			}
-			const invocationContext: InvocationContext = {
-				...context,
-				logger: invocationLogger,
-				metricExporter: new MetricExporter(),
-				stage: stage,
-				tracer: tracer,
-			};
-
 			const results = event.Records.map((record) => {
 				return pipe(
 					this.handleMessage(
@@ -73,13 +55,16 @@ export abstract class SQSController<Message> {
 					itemIdentifier: record?.messageId ?? '',
 				}));
 
-			invocationLogger.debug('batchItemFailures', prettyPrint(failures));
+			invocationContext.logger.debug(
+				'batchItemFailures',
+				prettyPrint(failures)
+			);
 
 			return {
 				batchItemFailures: failures,
 			};
 		} catch (error) {
-			invocationLogger.warn('Unknown error', prettyPrint(error));
+			invocationContext.logger.warn('Unknown error', prettyPrint(error));
 			throw error;
 		}
 	};

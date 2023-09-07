@@ -1,4 +1,3 @@
-import { buildLogger } from '@common/logging/loggerFactory';
 import {
 	APIGatewayAuthorizerResult,
 	APIGatewayRequestAuthorizerHandler,
@@ -6,12 +5,15 @@ import {
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import jwt_decode from 'jwt-decode';
 import { prettyPrint } from '@common/logging/prettyPrint';
+import { ApiGatewayHandler } from '@common/gateway/handler/apiGatewayHandler';
 
 export const handler: APIGatewayRequestAuthorizerHandler = async (
 	event,
 	context
 ) => {
-	const logger = buildLogger('CognitoLambdaAuthorizer');
+	const invocationContext =
+		ApiGatewayHandler.createInvocationContextOrThrow(context);
+	const { logger } = invocationContext;
 	logger.addContext(context);
 
 	const authHeader =

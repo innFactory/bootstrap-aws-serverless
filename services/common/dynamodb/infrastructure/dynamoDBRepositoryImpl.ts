@@ -27,6 +27,7 @@ export class DynamoDBRepositoryImpl
 			indexName?: string | undefined;
 			limit?: number;
 			cursor?: DynamoDB.Key;
+			sortOrder?: 'asc' | 'desc';
 		},
 		context: InvocationContext
 	): TaskResult<AllDataResponse<unknown>> => {
@@ -48,6 +49,12 @@ export class DynamoDBRepositoryImpl
 								expressionAttributeValues,
 							Limit: limit,
 							ExclusiveStartKey: cursor,
+							ScanIndexForward:
+								queryParams.sortOrder === undefined
+									? undefined
+									: queryParams.sortOrder === 'asc'
+									? true
+									: false,
 						}),
 						context.logger,
 						context.tracer
