@@ -1,0 +1,48 @@
+name: Deploy
+concurrency: ${{ github.ref }}
+
+# on:
+#   push:
+#     branches:
+#       - develop
+on: workflow_dispatch
+
+env:
+  ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'PROD' || github.ref == 'refs/heads/staging' && 'STAGING' || 'DEV' }}
+jobs:
+  app:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: adopt
+      - name: Install dependencies
+        run: npm ci
+      - name: Codegen
+        run: npm run codegen
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.ENVIRONMENT == 'PROD' && secrets.DEPLOY_ROLE_PROD || env.ENVIRONMENT == 'STAGING' && secrets.DEPLOY_ROLE_STAGING || secrets.DEPLOY_ROLE_DEV }}
+          role-session-name: adminServiceDeploySession
+          aws-region: eu-central-1
+      - name: Deploy Dev
+        if: env.ENVIRONMENT == 'DEV'
+        run: npm run ci:deploy:dev
+      - name: Deploy Staging
+        if: env.ENVIRONMENT == 'STAGING'
+        run: npm run ci:deploy:staging
+      - name: Deploy Prod
+        if: env.ENVIRONMENT == 'PROD'
+        run: npm run ci:deploy:prod
