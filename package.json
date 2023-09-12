@@ -8,6 +8,9 @@
     "build": "npm run check && sst build --profile=innfactory-demo",
     "deploy": "npm run check && sst deploy --profile=innfactory-demo",
     "deploy:test": "npm run check && sst deploy --profile=innfactory-demo --stage=test",
+    "ci:deploy:dev": "npm run check && sst deploy --stage=dev",
+    "ci:deploy:staging": "npm run check && sst deploy --stage=staging",
+    "ci:deploy:prod": "npm run check && sst deploy --stage=prod",
     "remove:test": "sst remove --profile=innfactory-demo --stage=test && npm run remove:log-groups",
     "remove:log-groups": "aws logs describe-log-groups --profile=innfactory-demo --query 'logGroups[?contains(logGroupName,`test`)].logGroupName' --output table | awk '{print $2}' | grep -v ^$ | while read x; do aws logs delete-log-group --profile=innfactory-demo --log-group-name $x; done",
     "remove": "sst remove --profile=innfactory-demo",
@@ -23,7 +26,8 @@
     "codegen:install": "npm i --no-save smithy-codegen/build/smithyprojections/smithy-codegen/source/typescript-ssdk-codegen",
     "codegen": "npm run codegen:clean && npm run codegen:build && npm run codegen:install && npm run codegen:client:application",
     "codegen:client:application": "openapi-generator-cli generate -i smithy-codegen/build/smithyprojections/smithy-codegen/source/openapi/Api.openapi.json -o services/test/utils/client -g typescript-axios --additional-properties npmName=api-client,supportsES6=false,useRxJs=false,withInterfaces=true",
-    "login": "aws sso login --profile=innfactory-demo"
+    "login": "aws sso login --profile=innfactory-demo",
+    "login:cognito": "aws cognito-idp admin-initiate-auth --region eu-central-1 --cli-input-json file://cognitoAuth.json --profile=innfactory-demo"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "1.6.0",
@@ -39,6 +43,7 @@
     "fp-ts": "^2.16.1",
     "inversify": "^6.0.1",
     "inversify-inject-decorators": "^3.1.0",
+    "jsonwebtoken": "9.0.2",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
@@ -50,6 +55,7 @@
     "@aws-smithy/server-common": "^1.0.0-alpha.10",
     "@openapitools/openapi-generator-cli": "^2.6.0",
     "@tsconfig/node16": "^1.0.3",
+    "@types/jsonwebtoken": "9.0.2",
     "@types/lodash": "^4.14.194",
     "@types/node": "^18.11.9",
     "@types/uuid": "^9.0.0",

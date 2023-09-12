@@ -54,6 +54,26 @@ Enter a name to identify YOUR stage and press enter.
 This will create a new stack in the AWS account.
 You can change the stack name in the `.sst` Folder in the `stage` File.
 
+### Using the insomnia workspace
+
+All endpoints are secured by a cognito authorizer.
+
+If you don't have a user create one via the aws cognito console or the cli and set your password (and thereby your account status to `Comfirmed`) with the command `npx aws cognito-idp admin-set-user-password --user-pool-id <your cognito user pool id> --username <your registered email> --password <your password> --permanent --profile innfactory-demo`. Thereafter create a file `cognitoAuth.json` beneath the `package.json` of the backend project containing the following json:
+
+```json
+{
+	"UserPoolId": "your cognito user pool id",
+	"ClientId": "your cognito client id",
+	"AuthFlow": "ADMIN_USER_PASSWORD_AUTH",
+	"AuthParameters": {
+		"USERNAME": "your email",
+		"PASSWORD": "your password"
+	}
+}
+```
+
+Thereafter use the `idToken` of the response of the command `npm run login:cognito` as bearer token with any query (copy the values of the base environment of insomnia into a private environment).
+
 ## Documentation
 
 ### Knowledgebase

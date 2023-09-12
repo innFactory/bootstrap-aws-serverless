@@ -3,6 +3,7 @@ import {
 	DeleteUserRequestServerInput,
 	GetUserByMailRequestServerInput,
 	GetUserRequestServerInput,
+	ListUsersRequestServerInput,
 	UpdatePasswordRequestServerInput,
 } from '@api';
 import { errorResults } from '@common/results/errorResults';
@@ -29,6 +30,18 @@ export const mapGetUserInput = (
 		return taskEither.right({ id: input.id });
 	} else {
 		return taskEither.left(errorResults.badRequest(''));
+	}
+};
+
+export const mapGetUsersInput = (
+	input: ListUsersRequestServerInput
+): TaskResult<ListUsersRequestServerInput> => {
+	if (input.limit !== undefined && (input.limit < 0 || input.limit > 60)) {
+		return taskEither.left(
+			errorResults.badRequest('Limit must be between 0 and 60')
+		);
+	} else {
+		return taskEither.right(input);
 	}
 };
 

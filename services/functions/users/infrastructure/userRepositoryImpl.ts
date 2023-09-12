@@ -15,6 +15,7 @@ import {
 	AttributeType,
 	UserType,
 	AdminDeleteUserCommand,
+	ListUsersCommandOutput,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { ServiceExceptionOptions } from '@aws-sdk/smithy-client/dist-types/exceptions';
 import { pipe } from 'fp-ts/lib/function';
@@ -22,8 +23,9 @@ import { taskEither } from 'fp-ts';
 import { errorResults } from '@common/results/errorResults';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { injectable } from 'inversify';
-import { User } from '../domain/model/user';
+import { PaginatedUsers, User } from '../domain/model/user';
 import { extractEnv } from '@common/utils/extractEnv';
+import { UsersRequest } from '@api';
 
 type CognitoOperationDimension =
 	| 'AdminCreateUserCommand'
@@ -32,6 +34,11 @@ type CognitoOperationDimension =
 	| 'AdminGetUserCommand'
 	| 'AdminUpdateUserAttributesCommand'
 	| 'AdminDeleteUserCommand';
+
+interface AllRecursive {
+	lastUsers: User[];
+	nextKey?: string;
+}
 
 @injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -52,6 +59,28 @@ export class UserRepositoryImpl implements UserRepository {
 			taskEither.map<AdminGetUserCommandOutput, User>(
 				this.mapOutFromCommand
 			)
+		);
+	}
+
+	getUsers(
+		instanceId: string,
+		usersRequest: UsersRequest,
+		context: InvocationContext
+	): TaskResult<PaginatedUsers> {
+		return pipe(
+			this.getUserPoolId(instanceId),
+			taskEither.chain((userPoolId) => {
+				if (usersRequest.queryAll) {
+					return this.listAll(userPoolId, context);
+				} else {
+					return this.listUsers(
+						userPoolId,
+						context,
+						usersRequest.limit,
+						usersRequest.lastEvaluatedKey
+					);
+				}
+			})
 		);
 	}
 
@@ -160,6 +189,80 @@ export class UserRepositoryImpl implements UserRepository {
 				this.deleteUserCommand(id, userPoolId, context)
 			),
 			taskEither.map(() => void 0)
+		);
+	}
+
+	private listAll(userpoolId: string, context: InvocationContext) {
+		const resolveRecursive = (
+			recursive: AllRecursive
+		): TaskResult<PaginatedUsers> =>
+			pipe(
+				this.sendCommand(
+					this.cognitoClient.send(
+						new ListUsersCommand({
+							UserPoolId: userpoolId,
+							Limit: 60,
+							PaginationToken: recursive.nextKey,
+						})
+					),
+					'ListUsersCommand',
+					context
+				),
+				taskEither.chain((result) => {
+					const users: User[] = recursive.lastUsers.concat(
+						result.Users?.map((user) => ({
+							email: this.extractEmail(user.Attributes),
+							id: user.Username ?? '',
+							status: user.UserStatus ?? '',
+						})) ?? []
+					);
+					if (result.PaginationToken) {
+						return resolveRecursive({
+							lastUsers: users,
+							nextKey: result.PaginationToken,
+						});
+					} else {
+						const paginated: PaginatedUsers = {
+							lastEvaluatedKey: undefined,
+							users: users,
+						};
+						return taskEither.right(paginated);
+					}
+				})
+			);
+
+		return resolveRecursive({ lastUsers: [] });
+	}
+
+	private listUsers(
+		userpoolId: string,
+		context: InvocationContext,
+		limit: number | undefined,
+		lastEvaluatedKey: string | undefined
+	): TaskResult<PaginatedUsers> {
+		return pipe(
+			this.sendCommand(
+				this.cognitoClient.send(
+					new ListUsersCommand({
+						UserPoolId: userpoolId,
+						Limit: limit ?? 60,
+						PaginationToken: lastEvaluatedKey,
+					})
+				),
+				'ListUsersCommand',
+				context
+			),
+			taskEither.map<ListUsersCommandOutput, PaginatedUsers>(
+				(result) => ({
+					users:
+						result.Users?.map((user) => ({
+							email: this.extractEmail(user.Attributes),
+							id: user.Username ?? '',
+							status: user.UserStatus ?? '',
+						})) ?? [],
+					lastEvaluatedKey: result.PaginationToken,
+				})
+			)
 		);
 	}
 

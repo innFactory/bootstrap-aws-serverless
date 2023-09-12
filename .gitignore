@@ -31,3 +31,6 @@ services/test/utils/client/*
 
 # openapi-generator
 openapitools.json
+
+# cognito credentials for login
+cognitoAuth*.json

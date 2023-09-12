@@ -1,7 +1,4 @@
-import {
-	postAuthentication,
-	preAuthentication,
-} from '@resources/auth/authFunctions';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { StackContext, Cognito, CognitoProps } from 'sst/constructs';
 import {
 	AccountRecovery,
@@ -10,6 +7,10 @@ import {
 	UserPoolClientIdentityProvider,
 	VerificationEmailStyle,
 } from 'aws-cdk-lib/aws-cognito';
+import {
+	postAuthentication,
+	preAuthentication,
+} from '@resources/auth/cognito/functions';
 
 const createDefaultCognitoSettings = (
 	context: StackContext,
@@ -25,6 +26,7 @@ const createDefaultCognitoSettings = (
 			authFlows: {
 				userPassword: true,
 				userSrp: true,
+				adminUserPassword: true,
 			},
 			oAuth: {
 				flows: {

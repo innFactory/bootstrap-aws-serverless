@@ -1,10 +1,18 @@
 import { StackContext, use } from 'sst/constructs';
-import {
-	createDefaultFunction,
-	defaultFunctionProps,
-} from 'stacks/common/defaultFunction';
+import { CognitoStack } from 'stacks/CognitoStack';
 import { DynamoDbStack } from 'stacks/DynamoDbStack';
 import { KeysStack } from 'stacks/KeysStack';
+import { createDefaultFunction } from 'stacks/common/defaultFunction';
+
+export const cognitoAuthorizationFunction = (context: StackContext) => {
+	const { userPoolIdEnvs } = use(CognitoStack);
+
+	return createDefaultFunction(context, 'cognito-authorizer', {
+		environment: { ...userPoolIdEnvs },
+		handler:
+			'services/functions/auth/application/handler/cognitoLambdaAuthorizer.handler',
+	});
+};
 
 export const preAuthentication = (
 	context: StackContext,
@@ -32,7 +40,6 @@ export const postAuthentication = (
 	const { loginAttemptsTable } = use(DynamoDbStack);
 
 	return createDefaultFunction(context, `${instanceId}-post-authentication`, {
-		...defaultFunctionProps(context),
 		handler:
 			'services/functions/auth/application/handler/postAuthentication.handler',
 		environment: {

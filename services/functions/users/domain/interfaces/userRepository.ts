@@ -1,6 +1,7 @@
 import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { TaskResult } from '@common/results/taskResult';
-import { User } from '../model/user';
+import { PaginatedUsers, User } from '../model/user';
+import { UsersRequest } from '@api';
 
 /**
  * users are differentiated by the instanceId
@@ -31,6 +32,11 @@ export interface UserRepository {
 		instanceId: string,
 		context: InvocationContext
 	): TaskResult<User>;
+	getUsers(
+		instanceId: string,
+		usersRequest: UsersRequest,
+		context: InvocationContext
+	): TaskResult<PaginatedUsers>;
 	delete(
 		id: string,
 		instanceId: string,

@@ -1,14 +1,15 @@
-import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { TaskResult } from '@common/results/taskResult';
 import { inject, injectable } from 'inversify';
 import { UserService } from '../interfaces/userService';
-import { User } from '../model/user';
+import { PaginatedUsers, User } from '../model/user';
 import { INJECTABLES } from '@common/injection/injectables';
 import { UserRepository } from '../interfaces/userRepository';
 import { LoginAttemptsRepository } from '@functions/loginAttempts/domain/interfaces/loginAttemptsRepository';
 import { pipe } from 'fp-ts/lib/function';
 import { option, taskEither } from 'fp-ts';
 import { errorResults } from '@common/results/errorResults';
+import { InvocationContextWithUser } from '@common/gateway/model/invocationContextWithUser';
+import { UsersRequest } from '@api';
 
 @injectable()
 export class UserServiceImpl implements UserService {
@@ -20,9 +21,17 @@ export class UserServiceImpl implements UserService {
 	getUserById(
 		id: string,
 		instanceId: string,
-		context: InvocationContext
+		context: InvocationContextWithUser
 	): TaskResult<User> {
 		return this.userRepository.getUserById(id, instanceId, context);
+	}
+
+	getUsers(
+		instanceId: string,
+		usersRequest: UsersRequest,
+		context: InvocationContextWithUser
+	): TaskResult<PaginatedUsers> {
+		return this.userRepository.getUsers(instanceId, usersRequest, context);
 	}
 
 	createUser(
@@ -31,7 +40,7 @@ export class UserServiceImpl implements UserService {
 			password: string;
 		},
 		instanceId: string,
-		context: InvocationContext
+		context: InvocationContextWithUser
 	): TaskResult<User> {
 		return this.userRepository.createUser(input, instanceId, context);
 	}
@@ -39,7 +48,7 @@ export class UserServiceImpl implements UserService {
 	getUserByEmail(
 		email: string,
 		instanceId: string,
-		context: InvocationContext
+		context: InvocationContextWithUser
 	): TaskResult<User> {
 		return pipe(
 			this.userRepository.getUserByEmail(email, instanceId, context),
@@ -58,7 +67,7 @@ export class UserServiceImpl implements UserService {
 		id: string,
 		password: string,
 		instanceId: string,
-		context: InvocationContext
+		context: InvocationContextWithUser
 	): TaskResult<void> {
 		return pipe(
 			this.userRepository.setPassword(id, password, instanceId, context),
@@ -82,7 +91,7 @@ export class UserServiceImpl implements UserService {
 	delete(
 		id: string,
 		instanceId: string,
-		context: InvocationContext
+		context: InvocationContextWithUser
 	): TaskResult<void> {
 		return this.userRepository.delete(id, instanceId, context);
 	}
