@@ -108,6 +108,7 @@ export class DynamoDBRepositoryImpl
 			tableKey: string;
 			itemKeys?: DDBKeys;
 			indexName?: string;
+			sortOrder?: 'asc' | 'desc';
 		},
 		context: InvocationContext
 	): TaskResult<AllDataResponse<unknown>> => {
@@ -127,6 +128,12 @@ export class DynamoDBRepositoryImpl
 								this.createExpressionAttributeNames(itemKeys),
 							ExpressionAttributeValues:
 								expressionAttributeValues,
+							ScanIndexForward:
+								queryParams.sortOrder === undefined
+									? undefined
+									: queryParams.sortOrder === 'asc'
+									? true
+									: false,
 						}),
 						undefined,
 						context.logger,
