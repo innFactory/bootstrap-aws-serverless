@@ -12,7 +12,7 @@ export default function (app: App) {
 		app.setDefaultRemovalPolicy(RemovalPolicy.DESTROY);
 	}
 	app.setDefaultFunctionProps({
-		runtime: 'nodejs16.x',
+		runtime: 'nodejs18.x',
 		environment: getEnvVars(app.stage),
 		nodejs: {
 			install: ['re2-wasm'],
