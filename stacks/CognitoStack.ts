@@ -7,16 +7,20 @@ import {
 	UserPoolClientIdentityProvider,
 	VerificationEmailStyle,
 } from 'aws-cdk-lib/aws-cognito';
+import {
+	postAuthentication,
+	preAuthentication,
+} from '@resources/auth/cognito/functions';
 
 const createDefaultCognitoSettings = (
-	_context: StackContext,
-	_instanceId: string
+	context: StackContext,
+	instanceId: string
 ): CognitoProps => ({
 	login: ['email'],
-	// triggers: {
-	// 	preAuthentication: preAuthentication(context, instanceId),
-	// 	postAuthentication: postAuthentication(context, instanceId),
-	// },
+	triggers: {
+		preAuthentication: preAuthentication(context, instanceId),
+		postAuthentication: postAuthentication(context, instanceId),
+	},
 	cdk: {
 		userPoolClient: {
 			authFlows: {
