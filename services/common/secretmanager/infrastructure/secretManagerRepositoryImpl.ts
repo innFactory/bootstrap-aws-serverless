@@ -6,13 +6,14 @@ import { taskEither } from 'fp-ts';
 import { prettyPrint } from '@common/logging/prettyPrint';
 import { errorResults } from '@common/results/errorResults';
 import { injectable } from 'inversify';
+import { SECRETS } from '../domain/models/secrets';
 
 @injectable()
 export class SecretManagerRepositoryImpl implements SecretManagerRepository {
 	private secretManager = new SecretsManager({ apiVersion: '2017-10-17' });
 
 	get<SecretType>(
-		secretKey: string,
+		secretKey: SECRETS,
 		context: InvocationContext
 	): TaskResult<SecretType> {
 		return taskEither.tryCatch(
@@ -24,12 +25,6 @@ export class SecretManagerRepositoryImpl implements SecretManagerRepository {
 							if (error) {
 								reject(error.message);
 							} else {
-								context.logger.debug(
-									'awsSecretResponse',
-									result.SecretString
-										? `secret with length ${result.SecretString.length} present`
-										: 'secret is undefined'
-								);
 								const secret = JSON.parse(
 									result.SecretString ?? '{}'
 								) as SecretType;
@@ -52,7 +47,7 @@ export class SecretManagerRepositoryImpl implements SecretManagerRepository {
 	}
 
 	create<SecretType>(
-		secretKey: string,
+		secretKey: SECRETS,
 		secret: SecretType,
 		context: InvocationContext,
 		description?: string
@@ -88,7 +83,7 @@ export class SecretManagerRepositoryImpl implements SecretManagerRepository {
 		);
 	}
 	updateSecretValue<SecretType>(
-		secretKey: string,
+		secretKey: SECRETS,
 		secret: SecretType,
 		context: InvocationContext
 	): TaskResult<void> {
@@ -122,7 +117,7 @@ export class SecretManagerRepositoryImpl implements SecretManagerRepository {
 		);
 	}
 
-	delete(secretKey: string, context: InvocationContext): TaskResult<void> {
+	delete(secretKey: SECRETS, context: InvocationContext): TaskResult<void> {
 		return taskEither.tryCatch(
 			() => {
 				return new Promise((resolve, reject) => {

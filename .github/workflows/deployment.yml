@@ -46,3 +46,15 @@ jobs:
       - name: Deploy Prod
         if: env.ENVIRONMENT == 'PROD'
         run: npm run ci:deploy:prod
+      - name: Trigger Migrations on Dev
+        if: env.ENVIRONMENT == 'DEV'
+        run: |
+          curl -X POST 'https://<dev.your_url>/v1/migrations' -H "Authorization: $(aws secretsmanager get-secret-value --secret-id migrations-api-key | jq -r '.SecretString | fromjson | .apiKey')"
+      - name: Trigger Migrations on Staging
+        if: env.ENVIRONMENT == 'STAGING'
+        run: |
+          curl -X POST 'https://<staging.your_url>/v1/migrations' -H "Authorization: $(aws secretsmanager get-secret-value --secret-id migrations-api-key | jq -r '.SecretString | fromjson | .apiKey')"
+      - name: Trigger Migrations on Prod
+        if: env.ENVIRONMENT == 'PROD'
+        run: |
+          curl -X POST 'https://<prod.your_url>/v1/migrations' -H "Authorization: $(aws secretsmanager get-secret-value --secret-id migrations-api-key | jq -r '.SecretString | fromjson | .apiKey')"
