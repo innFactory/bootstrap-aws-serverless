@@ -1,4 +1,4 @@
-import { createDeleteUserQueues } from '@resources/queues/deleteUserQueues';
+import { createDeleteUserQueues } from '@resources/users/queues';
 import { StackContext } from 'sst/constructs';
 
 export const QueuesStack = (context: StackContext) => {

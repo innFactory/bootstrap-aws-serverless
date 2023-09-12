@@ -1,5 +1,5 @@
 import { createApiGatewayErrorAlarms } from '@resources/alarming/alarms/apiGateway/errors';
-import { createAlarmTopic } from '@resources/alarming/alarmTopic';
+import { createAlarmTopic } from '@resources/alarming/topics';
 import { SnsAction } from 'aws-cdk-lib/aws-cloudwatch-actions';
 import { StackContext } from 'sst/constructs';
 

@@ -1,5 +1,5 @@
 import { ApiGatewayV1ApiAuthorizer, StackContext } from 'sst/constructs';
-import { apiKeyAuthFunction } from './apiKeyAuthFunction';
+import { apiKeyAuthFunction } from './functions';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 
 export const apiKeyAuthorizer = (

@@ -7,7 +7,8 @@ import { injectable } from 'inversify';
 import { userManagementUsers } from 'services/test/mockData/userManagementUsersMock';
 import { v4 } from 'uuid';
 import { UserRepository } from '../domain/interfaces/userRepository';
-import { User } from '../domain/model/user';
+import { PaginatedUsers, User } from '../domain/model/user';
+import { UsersRequest } from '@api';
 
 @injectable()
 export class UserManagementRepositoryTestMock implements UserRepository {
@@ -83,6 +84,14 @@ export class UserManagementRepositoryTestMock implements UserRepository {
 				errorResults.notFound('No user found in management repository')
 			);
 		}
+	}
+
+	getUsers(
+		_instanceId: string,
+		_usersRequest: UsersRequest,
+		_context: InvocationContext
+	): TaskResult<PaginatedUsers> {
+		throw new Error('Method not implemented.');
 	}
 
 	delete(

@@ -1,4 +1,4 @@
-import { deleteUserByQueue } from '@resources/users/usersFunctions';
+import { deleteUserByQueue } from '@resources/users/functions';
 import { Duration } from 'aws-cdk-lib';
 import { QueueEncryption } from 'aws-cdk-lib/aws-sqs';
 import { QueueConsumerProps, StackContext, use } from 'sst/constructs';

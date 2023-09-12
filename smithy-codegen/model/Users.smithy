@@ -12,6 +12,7 @@ resource User {
     create: CreateUserRequest
     read: GetUserRequest
     delete: DeleteUserRequest
+    list: ListUsersRequest
     operations: [UpdatePasswordRequest]
 }
 
@@ -54,6 +55,25 @@ structure GetUserInput for User {
     @required
     @httpLabel
     $id
+}
+
+@readonly
+@http(method: "GET", uri: "/v1/users")
+operation ListUsersRequest {
+    input: UsersRequest
+    output: UsersResponse
+}
+
+structure UsersRequest with [PaginatedInput] {
+}
+
+structure UsersResponse {
+    items: UsersResponseList
+    lastEvaluatedKey: String
+}
+
+list UsersResponseList {
+    member: UserOutput
 }
 
 @readonly

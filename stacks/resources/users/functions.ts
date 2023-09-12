@@ -68,6 +68,24 @@ export const getUserByMail = (context: StackContext) => {
 	});
 };
 
+export const getUsers = (context: StackContext) => {
+	const { userPoolIdEnvs, resourceARNs } = use(CognitoStack);
+
+	return createDefaultFunction(context, 'get-users', {
+		handler: 'services/functions/users/application/handler/all.handler',
+		environment: {
+			...userPoolIdEnvs,
+		},
+		permissions: [
+			new iam.PolicyStatement({
+				actions: ['cognito-idp:ListUsers'],
+				effect: iam.Effect.ALLOW,
+				resources: [...resourceARNs],
+			}),
+		],
+	});
+};
+
 export const updatePassword = (context: StackContext) => {
 	const { withDynamoDBKeyPolicy } = use(KeysStack);
 	const { loginAttemptsTable } = use(DynamoDbStack);

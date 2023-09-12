@@ -1,7 +1,7 @@
 import { StackContext } from 'sst/constructs';
-import createBankTable from '@resources/banks/banksTable';
-import createLoginAttemptsTable from '@resources/auth/loginAttemptsTable';
-import createMigrationsTable from '@resources/migrations/migrationsTable';
+import createBankTable from '@resources/banks/table';
+import createLoginAttemptsTable from '@resources/loginAttempts/table';
+import createMigrationsTable from '@resources/migrations/table';
 
 export function DynamoDbStack({ stack }: StackContext) {
 	const bankTable = createBankTable(stack);

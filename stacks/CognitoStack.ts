@@ -1,7 +1,4 @@
-import {
-	postAuthentication,
-	preAuthentication,
-} from '@resources/auth/authFunctions';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { StackContext, Cognito, CognitoProps } from 'sst/constructs';
 import {
 	AccountRecovery,
@@ -12,19 +9,20 @@ import {
 } from 'aws-cdk-lib/aws-cognito';
 
 const createDefaultCognitoSettings = (
-	context: StackContext,
-	instanceId: string
+	_context: StackContext,
+	_instanceId: string
 ): CognitoProps => ({
 	login: ['email'],
-	triggers: {
-		preAuthentication: preAuthentication(context, instanceId),
-		postAuthentication: postAuthentication(context, instanceId),
-	},
+	// triggers: {
+	// 	preAuthentication: preAuthentication(context, instanceId),
+	// 	postAuthentication: postAuthentication(context, instanceId),
+	// },
 	cdk: {
 		userPoolClient: {
 			authFlows: {
 				userPassword: true,
 				userSrp: true,
+				adminUserPassword: true,
 			},
 			oAuth: {
 				flows: {

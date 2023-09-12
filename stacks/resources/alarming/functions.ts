@@ -9,7 +9,7 @@ export const createAlarmPublisherFunction = (
 ): FunctionDefinition => ({
 	...defaultFunctionProps(context),
 	functionName: defaultFunctionName(context, 'alarm-publisher'),
-	timeout: '5 minutes',
+	timeout: '90 seconds',
 	handler: 'services/functions/alarms/publisher.handler',
 	permissions: ['secretsmanager'],
 });
