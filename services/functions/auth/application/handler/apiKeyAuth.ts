@@ -7,6 +7,7 @@ import { StatusCodes, errorResults } from '@common/results/errorResults';
 import { TaskResult } from '@common/results/taskResult';
 import { SecretManagerRepository } from '@common/secretmanager/domain/interfaces/secretManagerRepository';
 import { ApiKeySecret } from '@common/secretmanager/domain/models/apiKeySecret';
+import { SECRETS } from '@common/secretmanager/domain/models/secrets';
 import {
 	APIGatewayAuthorizerResult,
 	APIGatewayRequestAuthorizerHandler,
@@ -58,7 +59,7 @@ class ApiKeyAuthorizer extends BaseController {
 	auth(apiToken: string, context: InvocationContext): TaskResult<void> {
 		return pipe(
 			this.secretManagerRepository.get<ApiKeySecret>(
-				'migrations-api-key',
+				SECRETS.MIGRATIONS_API_KEY,
 				context
 			),
 			taskEither.chain((secret) => {

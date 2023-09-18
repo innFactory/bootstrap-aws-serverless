@@ -43,6 +43,10 @@ add the profile `innfactory-demo` into your aws config/credentials file in `~/.a
 4. Select the aws account and role that you want to setup, make sure to name the profile `innfactory-demo`
 5. run `npm run login`
 
+#### Secrets
+
+add the secrets mentioned in `services/common/secretmanager/domain/models/secrets.ts` into the secretsmanager of your aws account
+
 ### Start local SST development
 
 ```bash
@@ -176,6 +180,8 @@ In this project migrations are one time jobs, typically executed right after a s
 
 Use the following command in your pipe to trigger the migration after a successful deploy:
 `curl -X POST '<replace with api url>/v1/migrations' -H "Authorization: $(aws secretsmanager get-secret-value --secret-id migrations-api-key | jq -r '.SecretString | fromjson | .apiKey')"`
+
+-> Adjust the urls in the steps `Trigger migration on` in the deployment worfklow in `.github/workflows/deployment.yml`
 
 ### CDK Assets
 
