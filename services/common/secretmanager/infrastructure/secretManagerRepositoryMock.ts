@@ -32,7 +32,7 @@ export class SecretManagerRepositoryMock implements SecretManagerRepository {
 		if (secret) {
 			return taskEither.right(secret as SecretType);
 		} else {
-			context.logger.error(`No secret for key ${secretKey}`);
+			context.logger.error(`Mock: No secret for key ${secretKey}`);
 			return taskEither.left(
 				errorResults.internalServerError(`No secret`)
 			);
