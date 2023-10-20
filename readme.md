@@ -178,8 +178,12 @@ npm run test
 
 In this project migrations are one time jobs, typically executed right after a successful deployment. A migration could for example edit DynamoDB table fields or files in S3. To trigger the migrations use the api endpoint (refer to the smithy model or the ApiStack to find the endpoint) secured by a api key. Examine `./services/functions/migrations` and `./services/test/migrations` for better understanding.
 
-Use the following command in your pipe to trigger the migration after a successful deploy:
-`curl -X POST '<replace with api url>/v1/migrations' -H "Authorization: $(aws secretsmanager get-secret-value --secret-id migrations-api-key | jq -r '.SecretString | fromjson | .apiKey')"`
+Use the following command in your pipe to trigger the migration after a successful deploy
+
+-   on your dev/staging/production systems:
+    `curl --fail-with-body -X POST '<replace with api url>/v1/migrations' -H "Authorization: $(aws secretsmanager get-secret-value --secret-id migrations-api-key | jq -r '.SecretString | fromjson | .apiKey')"`
+-   on your test systems
+    `curl --fail-with-body -X POST '<replace with api url>/v1/migrations' -H "Authorization: test-api-key"`
 
 -> Adjust the urls in the steps `Trigger migration on` in the deployment worfklow in `.github/workflows/deployment.yml`
 
