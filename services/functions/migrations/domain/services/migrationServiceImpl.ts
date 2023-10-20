@@ -21,7 +21,7 @@ export class MigrationServiceImpl implements MigrationService {
 			this.migrationRepository.getLatestInProgress(context),
 			taskEither.bindTo('latestMigrationInProgress'),
 			taskEither.bind('latestSuccessfulMigration', () =>
-				this.migrationRepository.getLatestInProgress(context)
+				this.migrationRepository.getLatestSuccessful(context)
 			),
 			taskEither.chain(
 				({ latestMigrationInProgress, latestSuccessfulMigration }) =>
@@ -45,7 +45,10 @@ export class MigrationServiceImpl implements MigrationService {
 					)
 			),
 			taskEither.chain((result) => {
-				if (result.lastExecutedMigration?.status === 'SUCCESS') {
+				if (
+					result.lastExecutedMigration === undefined ||
+					result.lastExecutedMigration?.status === 'SUCCESS'
+				) {
 					return taskEither.right(void 0);
 				} else {
 					return taskEither.left(
