@@ -3,9 +3,9 @@
          mavenCentral()
      }
      dependencies {
-        "classpath" ("software.amazon.smithy.typescript:smithy-typescript-codegen:0.15.0")
-        "classpath" ("software.amazon.smithy.typescript:smithy-aws-typescript-codegen:0.15.0")
-        "classpath" ("software.amazon.smithy:smithy-cli:1.32.0")
+        "classpath" ("software.amazon.smithy.typescript:smithy-typescript-codegen:0.21.1")
+        "classpath" ("software.amazon.smithy.typescript:smithy-aws-typescript-codegen:0.21.1")
+        "classpath" ("software.amazon.smithy:smithy-cli:1.50.0")
      }
  }
 
@@ -19,9 +19,9 @@
  }
 
  dependencies {
-     implementation("software.amazon.smithy:smithy-model:1.32.0")
-     implementation("software.amazon.smithy:smithy-validation-model:1.32.0")
-     implementation("software.amazon.smithy:smithy-openapi:1.32.0")
-     implementation("software.amazon.smithy:smithy-aws-traits:1.32.0")
-     implementation("software.amazon.smithy:smithy-aws-apigateway-openapi:1.32.0")
+     implementation("software.amazon.smithy:smithy-model:1.50.0")
+     implementation("software.amazon.smithy:smithy-validation-model:1.50.0")
+     implementation("software.amazon.smithy:smithy-openapi:1.50.0")
+     implementation("software.amazon.smithy:smithy-aws-traits:1.50.0")
+     implementation("software.amazon.smithy:smithy-aws-apigateway-openapi:1.50.0")
  }

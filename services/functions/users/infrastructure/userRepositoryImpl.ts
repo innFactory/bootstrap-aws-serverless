@@ -1,31 +1,31 @@
-import { InvocationContext } from '@common/gateway/model/invocationContext';
-import { TaskResult } from '@common/results/taskResult';
-import { UserRepository } from '../domain/interfaces/userRepository';
+import { UsersRequest } from '@api';
 import {
-	CognitoIdentityProviderClient,
 	AdminCreateUserCommand,
 	AdminCreateUserCommandOutput,
-	UpdateUserAttributesCommandOutput,
-	AdminGetUserCommand,
-	MessageActionType,
-	AdminSetUserPasswordCommand,
-	ListUsersCommand,
-	AdminUpdateUserAttributesCommand,
-	AdminGetUserCommandOutput,
-	AttributeType,
-	UserType,
 	AdminDeleteUserCommand,
+	AdminGetUserCommand,
+	AdminGetUserCommandOutput,
+	AdminSetUserPasswordCommand,
+	AdminUpdateUserAttributesCommand,
+	AttributeType,
+	CognitoIdentityProviderClient,
+	ListUsersCommand,
 	ListUsersCommandOutput,
+	MessageActionType,
+	UpdateUserAttributesCommandOutput,
+	UserType,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { ServiceExceptionOptions } from '@aws-sdk/smithy-client/dist-types/exceptions';
-import { pipe } from 'fp-ts/lib/function';
-import { taskEither } from 'fp-ts';
-import { errorResults } from '@common/results/errorResults';
+import { __ServiceExceptionOptions as ServiceExceptionOptions } from '@aws-sdk/client-cognito-identity-provider/dist-types/models/CognitoIdentityProviderServiceException';
+import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { prettyPrint } from '@common/logging/prettyPrint';
-import { injectable } from 'inversify';
-import { PaginatedUsers, User } from '../domain/model/user';
+import { errorResults } from '@common/results/errorResults';
+import { TaskResult } from '@common/results/taskResult';
 import { extractEnv } from '@common/utils/extractEnv';
-import { UsersRequest } from '@api';
+import { taskEither } from 'fp-ts';
+import { pipe } from 'fp-ts/lib/function';
+import { injectable } from 'inversify';
+import { UserRepository } from '../domain/interfaces/userRepository';
+import { PaginatedUsers, User } from '../domain/model/user';
 
 type CognitoOperationDimension =
 	| 'AdminCreateUserCommand'

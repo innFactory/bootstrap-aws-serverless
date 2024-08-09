@@ -1,11 +1,11 @@
-import { Operation } from '@aws-smithy/server-common';
 import { Tracer } from '@aws-lambda-powertools/tracer';
+import { Operation } from '@aws-smithy/server-common';
+import { prettyPrint } from '@common/logging/prettyPrint';
 import { TaskResult } from '@common/results/taskResult';
+import { envEnum } from '@sst-env';
 import { Segment, Subsegment } from 'aws-xray-sdk-core';
 import { taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/lib/function';
-import { prettyPrint } from '@common/logging/prettyPrint';
-import { envEnum } from '@sst-env';
 import { isDev } from 'stacks/common/isOfStage';
 
 export const traceOperation = <I, O, Context>(
@@ -30,7 +30,9 @@ export const traceTaskResult = <T>(
 			return error;
 		}),
 		(result) => {
-			endTrace(tracer, parent, child);
+			if (parent && child) {
+				endTrace(tracer, parent, child);
+			}
 			return result;
 		}
 	);
@@ -49,16 +51,22 @@ export const tracePromise = <T>(
 			tracer.addErrorAsMetadata(error as Error);
 			throw error;
 		})
-		.finally(() => endTrace(tracer, parent, child));
+		.finally(() => {
+			if (parent && child) {
+				endTrace(tracer, parent, child);
+			}
+		});
 };
 
 const startTrace = (tracer: Tracer, context: string) => {
 	const parent = tracer.getSegment(); // This is the facade segment (the one that is created by AWS Lambda)
 	// Create subsegment for the function & set it as active
-	const child = parent.addNewSubsegment(
+	const child = parent?.addNewSubsegment(
 		`## ${process.env._HANDLER} - ${context}`
 	);
-	tracer.setSegment(child);
+	if (child) {
+		tracer.setSegment(child);
+	}
 	// Annotate the subsegment with the cold start & serviceName
 	tracer.annotateColdStart();
 	tracer.addServiceNameAnnotation();

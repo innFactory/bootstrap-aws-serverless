@@ -1,18 +1,18 @@
+import { HttpResponse } from '@aws-sdk/types';
+import { errorResults } from '@common/results/errorResults';
 import {
 	APIGatewayProxyEvent,
 	APIGatewayProxyEventHeaders,
 	Context,
 } from 'aws-lambda';
+import { either } from 'fp-ts';
+import { Either } from 'fp-ts/lib/Either';
 import jwt from 'jsonwebtoken';
 import {
 	InvocationContextWithUser,
 	UserContext,
 } from '../model/invocationContextWithUser';
 import { ApiGatewayHandler } from './apiGatewayHandler';
-import { errorResults } from '@common/results/errorResults';
-import { Either } from 'fp-ts/lib/Either';
-import { either } from 'fp-ts';
-import { HttpResponse } from '@aws-sdk/types';
 
 export class UserApiGatewayHandler extends ApiGatewayHandler<InvocationContextWithUser> {
 	protected createContext(
