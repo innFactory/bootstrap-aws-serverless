@@ -30,47 +30,55 @@
     "login:cognito": "aws cognito-idp admin-initiate-auth --region eu-central-1 --cli-input-json file://cognitoAuth.json --profile=innfactory-demo"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "1.6.0",
-    "@aws-lambda-powertools/tracer": "1.6.0",
-    "@aws-sdk/client-cloudwatch": "^3.409.0",
-    "@aws-sdk/client-cognito-identity-provider": "^3.409.0",
-    "@aws-sdk/util-base64-node": "^3.209.0",
-    "@aws-sdk/util-utf8-node": "^3.259.0",
-    "aws-jwt-verify": "^3.4.0",
-    "aws-sdk": "^2.1455.0",
-    "axios": "^1.5.0",
+    "@aws-lambda-powertools/logger": "2.5.0",
+    "@aws-lambda-powertools/tracer": "2.5.0",
+    "@aws-sdk/client-cloudwatch": "3.614.0",
+    "@aws-sdk/client-cognito-identity-provider": "3.614.0",
+    "@aws-sdk/util-base64-node": "3.209.0",
+    "@aws-sdk/util-utf8-node": "3.259.0",
+    "aws-jwt-verify": "4.0.1",
+    "aws-sdk": "2.1659.0",
+    "axios": "1.7.2",
     "cloudstructs": "^0.6.39",
     "fp-ts": "^2.16.1",
     "inversify": "^6.0.1",
     "inversify-inject-decorators": "^3.1.0",
     "jsonwebtoken": "9.0.2",
-    "jwt-decode": "^3.1.2",
-    "lodash": "^4.17.21",
-    "reflect-metadata": "^0.1.13",
-    "uuid": "^9.0.0"
+    "jwt-decode": "4.0.0",
+    "lodash": "4.17.21",
+    "reflect-metadata": "0.2.2",
+    "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@aws-sdk/types": "3.408.0",
-    "@aws-smithy/server-apigateway": "^1.0.0-alpha.10",
-    "@aws-smithy/server-common": "^1.0.0-alpha.10",
-    "@openapitools/openapi-generator-cli": "^2.6.0",
-    "@tsconfig/node16": "^1.0.3",
+    "@aws-sdk/types": "3.609.0",
+    "@aws-smithy/server-apigateway": "1.0.0-alpha.10",
+    "@aws-smithy/server-common": "1.0.0-alpha.10",
+    "@openapitools/openapi-generator-cli": "2.13.4",
+    "@tsconfig/node16": "1.0.3",
     "@types/jsonwebtoken": "9.0.2",
-    "@types/lodash": "^4.14.194",
+    "@types/lodash": "4.17.7",
     "@types/node": "^18.11.9",
-    "@types/uuid": "^9.0.0",
+    "@types/uuid": "10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
-    "aws-cdk-lib": "2.91.0",
-    "constructs": "10.2.69",
+    "aws-cdk-lib": "2.142.1",
+    "constructs": "10.3.0",
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^8.7.0",
     "prettier": "^2.7.1",
-    "sst": "2.24.27",
-    "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.1.0",
-    "typescript": "^4.8.4",
-    "vitest": "^0.33.0"
+    "sst": "2.43.4",
+    "ts-node": "10.9.2",
+    "tsconfig-paths": "4.2.0",
+    "typescript": "5.5.4",
+    "vitest": "0.33.0"
+  },
+  "overrides": {
+    "@aws-sdk/credential-provider-sso": "3.210.0"
+  },
+  "dependenciesComments": {
+    "overrides": {
+      "@aws-sdk/credential-provider-sso": "This override is used to avoid following bug after npm start (local): sso_region not found. -> It maybe can be removed after update the aws dependencies"
+    }
   },
   "workspaces": [
     "services"

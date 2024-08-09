@@ -1,11 +1,11 @@
+import { ApiGatewayHandler } from '@common/gateway/handler/apiGatewayHandler';
+import { prettyPrint } from '@common/logging/prettyPrint';
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import {
 	APIGatewayAuthorizerResult,
 	APIGatewayRequestAuthorizerHandler,
 } from 'aws-lambda';
-import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import jwt_decode from 'jwt-decode';
-import { prettyPrint } from '@common/logging/prettyPrint';
-import { ApiGatewayHandler } from '@common/gateway/handler/apiGatewayHandler';
+import { jwtDecode } from 'jwt-decode';
 
 export const handler: APIGatewayRequestAuthorizerHandler = async (
 	event,
@@ -24,7 +24,7 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (
 	}
 	const token = authHeader.substring(7, authHeader.length);
 
-	const decoded: { [key: string]: unknown } = jwt_decode(token);
+	const decoded: { [key: string]: unknown } = jwtDecode(token);
 	const iss = decoded['iss'] as string;
 	const userPoolId = iss.replace(
 		'https://cognito-idp.eu-central-1.amazonaws.com/',

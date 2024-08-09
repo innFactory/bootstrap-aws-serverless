@@ -1,8 +1,6 @@
-import { createLogger, Logger } from '@aws-lambda-powertools/logger';
-import {
-	ConstructorOptions,
-	LogLevel,
-} from '@aws-lambda-powertools/logger/lib/types';
+import { Logger } from '@aws-lambda-powertools/logger';
+import { ConstructorOptions } from '@aws-lambda-powertools/logger/lib/cjs/types/Logger';
+import { LogLevel } from '@aws-sdk/client-cognito-identity-provider';
 import { envEnum } from '@sst-env';
 import { isDeployedStage } from 'stacks/common/isOfStage';
 import { CustomLogFormatter } from './customLogFormatter';
@@ -21,6 +19,8 @@ export const buildLogger = (serviceName: string, logger?: Logger) => {
 	};
 	if (logger) {
 		return logger.createChild(options);
+	} else {
+		const logger = new Logger({ logLevel: logLevel as LogLevel });
+		return logger;
 	}
-	return createLogger(options);
 };

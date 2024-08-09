@@ -2,6 +2,7 @@ import { InvocationContext } from '@common/gateway/model/invocationContext';
 import { TaskResult } from '@common/results/taskResult';
 import { taskEither } from 'fp-ts';
 import { injectable } from 'inversify';
+import * as _ from 'lodash';
 import { dbMock } from 'services/test/mockData/dbMock';
 import {
 	DDBItem,
@@ -10,7 +11,6 @@ import {
 	DynamoDBRepository,
 } from '../domain/interfaces/dynamoDbRepository';
 import { AllDataResponse } from '../domain/model/allDataResponse';
-import * as _ from 'lodash';
 
 @injectable()
 export class DynamoDBRepositoryMock
@@ -158,7 +158,7 @@ export class DynamoDBRepositoryMock
 		return Object.keys(item).reduce<DDBKeys>((itemKeys, key) => {
 			const obj = { ...itemKeys };
 			const value = item[key];
-			if (value instanceof DDBKey<unknown>) {
+			if (value instanceof DDBKey) {
 				obj[key] = value;
 			}
 			return obj;

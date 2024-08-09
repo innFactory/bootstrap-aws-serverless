@@ -1,5 +1,6 @@
 import {
 	CloudWatchClient,
+	MetricDatum,
 	PutMetricDataCommand,
 	PutMetricDataCommandInput,
 } from '@aws-sdk/client-cloudwatch'; // ES Modules import
@@ -20,7 +21,7 @@ export class MetricExporter {
 		if (!isTestStage(context.stage)) {
 			const metric: PutMetricDataCommandInput = {
 				Namespace: `Bootstrap-${context.stage}`,
-				MetricData: metricData,
+				MetricData: metricData as MetricDatum[],
 			};
 			context.logger.info(`Exporting metric`, `${prettyPrint(metric)}`);
 			return taskEither.tryCatch(
